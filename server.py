@@ -74,10 +74,7 @@ def confirmation():
 	user.gender = gender
 	db.session.commit()
 
-	return redirect("/")
-
-
-
+	return redirect("/users/%s/%s" % (user.user_id, user.user_name))
 
 	
 
@@ -129,6 +126,9 @@ def user_detail(user_id, user_name):
     user = User.query.get(user_id)
     return render_template("user.html", user=user)
 
+@app.route('/schedule_run')
+def scheduling_run(): 
+	return render_template('schedule_run.html')
 
 
 if __name__ == "__main__":

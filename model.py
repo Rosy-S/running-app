@@ -1,6 +1,7 @@
 """Models and database functions for Runing project."""
 
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime 
 
 # This is the connection to the SQLite database; we're getting this through
 # the Flask-SQLAlchemy helper library. On this, we can find the `session`
@@ -58,10 +59,27 @@ class Preference(db.Model):
         return "<User user_id=%s>" % (self.user_id)
 
 
-# class Match(db.Model): 
-#     __tablename__ = "matches"
+class Match(db.Model): 
+    __tablename__ = "matches"
 
-#     pass 
+    match_id = db.Column(db.Integer,autoincrement=True, primary_key=True)
+    user1 = db.Column(db.Integer, db.ForeignKey('users.user_id'))
+    active_status = db.Column(db.Boolean, nullable=False, default=True)
+    lat_coordinates = db.Column(db.Integer, nullable=False)
+    lon_coordinates = db.Column(db.Integer, nullable=False)
+    time_start = db.Column(db.DATETIME, default=datetime.now())
+    time_end = db.Column(db.DATETIME)
+    duration = db.Column(db.Integer)
+
+    # Define relationship to user
+    user = db.relationship("User",
+                           backref=db.backref("matches", order_by=user1))
+    def __repr__(self):
+        """Provide helpful representation when printed."""
+
+        return "<Match for user1=%s, time_start=%s>" % (self.user1, self.time_start)
+
+
 
 # class Run(db.Model): 
 #     __tablename__ = "runs"
