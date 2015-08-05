@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block content %}
+
+ <p> Great! You have just made your new profile! Let's find your preferences so that we can match you up with the best running buddy for you. </p>
+
+<form action="/confirmation" method="POST">
+
+	<div>
+		<label>
+			What is your preferred distance? <br>
+			I want to run <input type="text" name="distance"> miles today. <br>
+		</label>
+	</div>
+
+	<div>
+		<label>
+			Do you know your mile time?  <br>
+			I tend to run at a <input type="text" name="mile_time"> minutes per mile pace. <br>
+		</label>
+	</div>
+
+	<div>
+		<label>
+			I want to run with someone of the same gender. <br>
+				<input type="radio" name="gender_preference" value="yes"> Yes
+				<input type="radio" name ="gender_preference"
+				value="no"> Doesn't matter
+
+		</label>
+
+	<div> 
+		<label>
+			What is your gender? <br>
+			<input type="radio" name="gender" value="female"> Female 
+			<input type="radio" name="gender" value="male"> Male 
+			<input type="radio" name="gender" value="none"> Other<br>
+		</label>
+
+<hr>
+
+<p> We can send you a text as soon as there is a match. Do you want to provide your phone number for this functionality? (if not, just leave it blank to use just your email.)
+
+	<div>
+		Yes, my phone number is <input type="text" name="phone"><br>
+
+    <div>
+        <input type="submit" value="Finish my profile">
+    </div>
+
+</form>
+
+{% endblock %}
+
+
