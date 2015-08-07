@@ -45,7 +45,6 @@ class Preference(db.Model):
     phone = db.Column(db.Integer, nullable=True)
     #Pairing Info
     mile_time = db.Column(db.Integer, nullable=True)
-    miles = db.Column(db.Integer, nullable=True)
     #if True, user is a Female. If False, user is a Male, if blank, user doesn't 
     # care on who they get paired with or don't want to specify.
     gender_preference = db.Column(db.String(3), nullable=True)
@@ -79,7 +78,18 @@ class Match(db.Model):
 
         return "<Match for user1=%s, time_start=%s>" % (self.user1, self.time_start)
 
+    def json(self):
+        my_json_representation = {}
+        my_json_representation['user'] = self.user
+        my_json_representation['active_status'] = self.active_status
+        my_json_representation['lat_coordinates'] = self.lat_coordinates
+        my_json_representation['lon_coordinates'] = self.lon_coordinates
+        my_json_representation['time_start'] = self.time_start
+        my_json_representation['time_end'] = self.time_end
+        my_json_representation['duration'] = self.duration
 
+        # finish adding all the atributes to this json thingie
+        return my_json_representation
 
 # class Run(db.Model): 
 #     __tablename__ = "runs"

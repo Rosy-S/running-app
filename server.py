@@ -24,6 +24,7 @@ def index():
 
     return render_template("homepage.html")
 
+########REGISTRATION #####################################
 
 @app.route('/register', methods=['GET'])
 def register_form():
@@ -56,7 +57,6 @@ def register_process():
 
 @app.route('/confirmation', methods=['POST'])
 def confirmation(): 
-	miles = request.form["distance"]
 	mile_time = request.form["mile_time"]
 	gender_preference = request.form["gender_preference"]
 	phone = request.form["phone"]
@@ -64,7 +64,7 @@ def confirmation():
 	user = User.query.get(user_id)
 
 	# making preferences for a user
-	preferences = Preference(user_id=user_id, phone=phone, mile_time=mile_time, miles=miles, gender_preference=gender_preference)
+	preferences = Preference(user_id=user_id, phone=phone, mile_time=mile_time, gender_preference=gender_preference)
 	db.session.add(preferences)
 	db.session.commit()
 	flash("your preferences have been updated! Thanks!")
@@ -77,7 +77,7 @@ def confirmation():
 	return redirect("/users/%s/%s" % (user.user_id, user.user_name))
 
 	
-
+################LOGING IN ROUTES #####################################
 
 @app.route('/login', methods=['GET'])
 def login_form():
@@ -119,6 +119,7 @@ def logout():
     return redirect("/")
 
 
+
 @app.route("/users/<int:user_id>/<user_name>")
 def user_detail(user_id, user_name):
     """Show info about user."""
@@ -129,6 +130,22 @@ def user_detail(user_id, user_name):
 @app.route('/schedule_run')
 def scheduling_run(): 
 	return render_template('schedule_run.html')
+	# return render_template('test.html')
+# GET http://localhost:5000/favicon.ico 404
+
+@app.route('/finding_match')
+def finding_match(): 
+	lat = request.form.get('lat')
+	lon = request.form.get('lon')
+	new_match = Match(user1="I need to get that still", lat_coordinates=lat, lon_coordinates=lon, time_end='I need to make that still', duration='I also need to make this.')
+
+#query for matches. 
+
+# for each match, call match.json()
+
+# it will return a dictionary of attibutes
+
+	return jsonfiy()
 
 
 if __name__ == "__main__":

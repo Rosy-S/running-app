@@ -1,11 +1,24 @@
-{% extends 'base.html' %}
-
-{% block content %}
-
+<html>
+<head>
+<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true"></script>
+ <script src="/static/match.js"></script>
+</head>
+<body>
 <h1> You want to run! </h1>
 
-<p> Awesome! Let's find you a running partner </p>
+<p> Awesome! Let's find you a running partner close by: </p>
+<style> 
+#map-canvas {
+	height: 75%;
+	margin: 3;
+	padding: 0;
+}
+</style>
 
+<div id="map-canvas"></div>
 
+This is your location right now. Let's find someone close to you that also runs at relatively the same pace. 
 
-{% endblock %}
+</body>
+</html>
+
