@@ -22,6 +22,7 @@ function initialize() {
       lon = position.coords.longitude;
       console.log(lat);
       console.log(lon);
+      
 
 
       var infowindow = new google.maps.InfoWindow({

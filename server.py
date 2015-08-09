@@ -3,7 +3,9 @@ from jinja2 import StrictUndefined
 from flask import Flask, render_template, request, flash, redirect, session
 from flask_debugtoolbar import DebugToolbarExtension
 
-from model import connect_to_db, db, User, Preference
+from datetime import datetime
+
+from model import connect_to_db, db, User, Preference, Match
 
 
 app = Flask(__name__)
@@ -135,17 +137,26 @@ def scheduling_run():
 
 @app.route('/finding_match')
 def finding_match(): 
-	lat = request.form.get('lat')
-	lon = request.form.get('lon')
-	new_match = Match(user1="I need to get that still", lat_coordinates=lat, lon_coordinates=lon, time_end='I need to make that still', duration='I also need to make this.')
+    print "************************************************"
+    print "session id: ", session['user_id']
+    lat = request.form.get('lat')
+    lon = request.form.get('lon')
+    duration = request.form.get("datetime")
+    print "lat = ", lat
+    print "lon = ", lon
+    print "datetime: ", datetime
 
-#query for matches. 
+    a = datetime(2015, 8, 9, 20, 4, 49, 757635)
+    new_match = Match(user1=session['user_id'], lat_coordinates=lat, lon_coordinates=lon, time_end=a, duration=30)
+    db.session.add(new_match)
+    db.session.commit()
+    return jsonfiy(new_match.json())
 
-# for each match, call match.json()
+        #query for matches. 
 
-# it will return a dictionary of attibutes
+        # for each match, call match.json()
 
-	return jsonfiy()
+        # it will return a dictionary of attibutes
 
 
 if __name__ == "__main__":

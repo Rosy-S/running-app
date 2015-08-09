@@ -1,15 +1,36 @@
-{% extends 'base.html' %}
+<html>
+<head>
+    <script src="https://code.jquery.com/jquery.js"></script>
+	<script src="static/moment.min.js"></script> 
+	<script src="static/combodate.js"></script> 
 
-{% block content %}
 
+<body>
   <h1>{{ user.user_name }} </h1>
 
   <p> This is your profile. Feel free to write down goals, put up images, or anything you feel like here. If you want to find a running partner, please click on the button below and allow the location pop up that pops up</p>
 
+  <form id="duration" action="/finding_match" method="POST">
+
+ 	<div>
+ 		<label>
+ 			How long do you want to run for? 
+ 				<input type="text" id="time" data-format="HH:mm" data-template="HH : mm" name="datetime">
+					<script>
+					$(function initialize(){
+					    $('#time').combodate({
+					        firstItem: 'name', //show 'hour' and 'minute' string at first item of dropdown
+					        minuteStep: 1
+					    });  
+					});
+					document.onload.initialize()
+					</script>
+		</label>
+
   <input type="button" onclick="location.href='/schedule_run';" value="Find someone to run with" />
 
   <hr>
+</body>
 
-
-
-{% endblock %}
+</head>
+</html>
