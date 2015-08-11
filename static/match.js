@@ -1,6 +1,7 @@
 // Note: This example requires that you consent to location sharing when
 // prompted by your browser. If you see a blank space instead of the map, this
 // is probably because you have denied permission for location sharing.
+$(document).on('ready', function(){
 console.log('beginning test');
 var map;
 var lat;
@@ -30,8 +31,9 @@ function initialize() {
         position: pos,
         content: 'Location found using HTML5.'
       });
-
-      var inputs = {"lat": lat, "lon": lon};
+      var matchDuration = $('#match_data').data('duration');
+      var matchWaitTime = $('#match_data').data('wait-time');
+      var inputs = {"lat": lat, "lon": lon, "duration": matchDuration, "wait_time": matchWaitTime};
 
       $.post('/finding_match', inputs , function(data){
         console.log(data);
@@ -72,3 +74,4 @@ function handleNoGeolocation(errorFlag) {
 
 
 google.maps.event.addDomListener(window, 'load', initialize);
+});

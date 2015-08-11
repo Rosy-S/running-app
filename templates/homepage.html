@@ -3,6 +3,16 @@
 
   <h1>TEST HOME PAGE</h1>
 
- <p> {{session.user_id}} is currently logged in. </p>
+{% if "user_id" in session and "user_name" in session %} 
+
+	 <p> {{session.user_id}}, {{session.user_name}} is currently logged in. </p>
+
+	 <p> <a href="/users/{{session['user_id']}}/{{session['user_name']}}"> go to your profile </a> 
+
+{% else %}
+	<p> You are not currently logged in. </p>
+	
+{% endif %} 
+
 
 {% endblock %}

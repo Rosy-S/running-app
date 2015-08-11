@@ -80,7 +80,7 @@ class Match(db.Model):
 
     def json(self):
         my_json_representation = {}
-        my_json_representation['user'] = self.user
+        my_json_representation['user'] = self.user1
         my_json_representation['active_status'] = self.active_status
         my_json_representation['lat_coordinates'] = self.lat_coordinates
         my_json_representation['lon_coordinates'] = self.lon_coordinates
