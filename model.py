@@ -1,7 +1,7 @@
 """Models and database functions for Runing project."""
 
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime 
+import datetime
 
 # This is the connection to the SQLite database; we're getting this through
 # the Flask-SQLAlchemy helper library. On this, we can find the `session`
@@ -62,11 +62,11 @@ class Match(db.Model):
     __tablename__ = "matches"
 
     match_id = db.Column(db.Integer,autoincrement=True, primary_key=True)
-    user1 = db.Column(db.Integer, db.ForeignKey('users.user_id'))
+    user1 = db.Column(db.Integer, db.ForeignKey('users.user_id',), unique=True)
     active_status = db.Column(db.Boolean, nullable=False, default=True)
     lat_coordinates = db.Column(db.Float, nullable=False)
     lon_coordinates = db.Column(db.Float, nullable=False)
-    time_start = db.Column(db.DATETIME, default=datetime.now())
+    time_start = db.Column(db.DATETIME, default=datetime.datetime.now())
     time_end = db.Column(db.DATETIME)
     duration = db.Column(db.Integer)
 

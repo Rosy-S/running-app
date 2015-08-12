@@ -3,11 +3,11 @@ from jinja2 import StrictUndefined
 from flask import Flask, render_template, request, flash, redirect, session, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 
-from datetime import datetime
+import datetime
 
 from model import connect_to_db, db, User, Preference, Match
 
-
+import re
 
 
 app = Flask(__name__)
@@ -120,8 +120,7 @@ def login_process():
     session["user_id"] = user.user_id
     session["user_name"] = user.user_name
     
-    print "session: ", session
-    #print "session_object", session["user_object"]
+
     flash("Logged in")
     return redirect("/users/%s/%s" % (user.user_id, user.user_name))
 
@@ -130,6 +129,7 @@ def login_process():
 def logout():
     """Log out."""
 
+#FIX-ME:  HOW TO DELETE WHOLE DITIONARIES INSTEAD OF JUST KEYS...
     del session["user_id"]
     del session['user_name']
     flash("Logged Out.")
@@ -145,8 +145,7 @@ def user_detail(user_id, user_name):
     user = User.query.get(user_id)
     user_id = int(user.user_id)
     user_name = str(user.user_name)
-    print "user_id: ", user_id, type(user_id)
-    print "user_name: ", user_name, type(user_name)
+
     return render_template("user.html", user_id=user_id, user_name=user_name)
 
 
@@ -157,8 +156,7 @@ def scheduling_run(user_id, user_name):
     wait_time = request.form.get("time_amount")
     print "duration: ", duration
     return render_template('schedule_run.html', duration=duration, wait_time=wait_time)
-    # return render_template('test.html')
-# GET http://localhost:5000/favicon.ico 404
+
 
 @app.route('/match')
 def match(): 
@@ -169,26 +167,44 @@ def match():
 @app.route('/finding_match', methods=["POST"])
 def finding_match(): 
     print "************************************************"
-    print "session id: ", session['user_id']
+    # Adding/updating a match column for the user currently in the session.
     lat = request.form.get('lat')
     lon = request.form.get('lon')
-    duration = request.form.get("amount")
-    wait_time = request.form.get("time_amount")    
+    session['lat'] = lat
+    session['lon'] = lon
+    print "session: ", session
+    duration = request.form.get("duration")
+    duration = int(re.sub("[^0-9]", "", duration))
+    wait_time = request.form.get("wait_time")  
+    wait_time = int(re.sub("[^0-9]", "", wait_time))  
+    time_end = datetime.datetime.now() + datetime.timedelta(minutes=wait_time) 
+
+    # if a the user already has a match existing in the database, update it with the new info. 
+    # if not, make a new match. That way, there will always be only one match per user in the Match table.
+    old_match = Match.query.filter_by(user1=session['user_id']).first()
+    if not old_match:
+        old_match = Match(user1=session['user_id'], lat_coordinates=lat, lon_coordinates=lon, time_start=datetime.datetime.now(), time_end=time_end, duration=duration)
+        db.session.add(old_match)
+        db.session.commit()
+    else: 
+        old_match.lat_coordinates = lat
+        old_match.lon_coordinates = lon
+        old_match.time_start = datetime.datetime.now()
+        old_match.time_end = time_end
+        old_match.duration = duration
+        db.session.commit()
+
+    print "new match dictionary: ", old_match.json()
+
+    
+    #Comparing the match info of the user in the current session to matches in db.
+    # Need to compare their location,distance they want to run, time_end, gender preferences, and pace.
+    user = User.query.get(session['user_id'])
+    matches = []
+    Match.query.filter_by()
 
 
-    a = datetime(2015, 8, 9, 20, 4, 49, 757635)
-
-    #FIX-ME: do not hardcode data. update once form is working.
-    new_match = Match(user1=session['user_id'], lat_coordinates=lat, lon_coordinates=lon, time_end=a, duration=30)
-    db.session.add(new_match)
-    db.session.commit()
-    return jsonify(new_match.json())
-
-        #query for matches. 
-
-        # for each match, call match.json()
-
-        # it will return a dictionary of attibutes
+    return jsonify(old_match.json())
 
 
 if __name__ == "__main__":
