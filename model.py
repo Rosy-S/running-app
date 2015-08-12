@@ -24,8 +24,8 @@ class User(db.Model):
 
     # Optional info
 
-    # if gender = True, user is female. if 
-    gender = db.Column(db.String(6), nullable=True)
+    # if gender = True, user is female. 
+    # gender = db.Column(db.String(6), nullable=True)
     # Everything else besides user_name and password is nullable. User only needs those two
     # things to login and make a profile. If they don't specify mile_time, they don't care who
     # they get paird with or don't know their miletime. If they don't provide their phone, 
@@ -47,7 +47,7 @@ class Preference(db.Model):
     mile_time = db.Column(db.Integer, nullable=True)
     #if True, user is a Female. If False, user is a Male, if blank, user doesn't 
     # care on who they get paired with or don't want to specify.
-    gender_preference = db.Column(db.String(3), nullable=True)
+    # gender_preference = db.Column(db.String(3), nullable=True)
 
     # Define relationship to user
     user = db.relationship("User",
@@ -55,7 +55,7 @@ class Preference(db.Model):
     def __repr__(self):
         """Provide helpful representation when printed."""
 
-        return "<User user_id=%s>" % (self.user_id)
+        return "<Preferences user_id=%s>" % (self.user_id)
 
 
 class Match(db.Model): 
@@ -76,7 +76,7 @@ class Match(db.Model):
     def __repr__(self):
         """Provide helpful representation when printed."""
 
-        return "<Match for user1=%s, time_start=%s>" % (self.user1, self.time_start)
+        return "<Match id for user1=%s is %s, time_start=%s>" % (self.user1, self.match_id, self.time_start)
 
     def json(self):
         my_json_representation = {}

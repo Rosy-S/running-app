@@ -71,21 +71,21 @@ def register_process():
 @app.route('/confirmation', methods=['POST'])
 def confirmation(): 
     mile_time = request.form["mile_time"]
-    gender_preference = request.form["gender_preference"]
+    # gender_preference = request.form["gender_preference"]
     phone = request.form["phone"]
     user_id = session['user_id']
     user = User.query.get(user_id)
 
     # making preferences for a user
-    preferences = Preference(user_id=user_id, phone=phone, mile_time=mile_time, gender_preference=gender_preference)
+    preferences = Preference(user_id=user_id, phone=phone, mile_time=mile_time)
     db.session.add(preferences)
     db.session.commit()
     flash("your preferences have been updated! Thanks!")
 
     # updating gender for a user
-    gender = request.form["gender"]
-    user.gender = gender
-    db.session.commit()
+    # gender = request.form["gender"]
+    # user.gender = gender
+    # db.session.commit()
 
     return redirect("/users/%s/%s" % (user.user_id, user.user_name))
 
@@ -129,9 +129,7 @@ def login_process():
 def logout():
     """Log out."""
 
-#FIX-ME:  HOW TO DELETE WHOLE DITIONARIES INSTEAD OF JUST KEYS...
-    del session["user_id"]
-    del session['user_name']
+    session.clear()
     flash("Logged Out.")
     return redirect("/")
 
@@ -198,11 +196,22 @@ def finding_match():
 
     
     #Comparing the match info of the user in the current session to matches in db.
-    # Need to compare their location,distance they want to run, time_end, gender preferences, and pace.
-    user = User.query.get(session['user_id'])
-    matches = []
-    Match.query.filter_by()
+    # Need to compare their gender preferences, pace, duration, time_end, and location.
+    current_user = User.query.get(session['user_id'])
+    current_user_pace = current_user.preferences[0].mile_time
+    current_user_duration = duration
+    current_user_end_time = time_end
+    #querying first for all UNEXPIRED possible matches that are not the user itself.
+    potential_matches = Match.query.filter(Match.time_end > datetime.datetime.now(), Match.user1 != current_user.user_id).all()
 
+    #querying for pace, duration, and location
+    matches = []
+    for match in potential_matches: 
+        match_preferences = match = user.preferences[0]
+        if abs(current_user_pace - match_preferences.mile_time)  < 1.5: 
+            if abs(current_user_duration - match.duration) < 10: 
+                matches.append(match)
+    print matches 
 
     return jsonify(old_match.json())
 
