@@ -7,7 +7,9 @@ import datetime
 
 from model import connect_to_db, db, User, Preference, Match
 
-import re
+import re, math
+
+CONSTANT_MI_DEGREE = 69
 
 
 app = Flask(__name__)
@@ -152,7 +154,6 @@ def user_detail(user_id, user_name):
 def scheduling_run(user_id, user_name): 
     duration = request.form.get("amount")
     wait_time = request.form.get("time_amount")
-    print "duration: ", duration
     return render_template('schedule_run.html', duration=duration, wait_time=wait_time)
 
 
@@ -166,11 +167,10 @@ def match():
 def finding_match(): 
     print "************************************************"
     # Adding/updating a match column for the user currently in the session.
-    lat = request.form.get('lat')
-    lon = request.form.get('lon')
+    lat = float(request.form.get('lat'))
+    lon = float(request.form.get('lon'))
     session['lat'] = lat
     session['lon'] = lon
-    print "session: ", session
     duration = request.form.get("duration")
     duration = int(re.sub("[^0-9]", "", duration))
     wait_time = request.form.get("wait_time")  
@@ -192,7 +192,7 @@ def finding_match():
         old_match.duration = duration
         db.session.commit()
 
-    print "new match dictionary: ", old_match.json()
+    # print "new match dictionary: ", old_match.json()
 
     
     #Comparing the match info of the user in the current session to matches in db.
@@ -207,13 +207,32 @@ def finding_match():
     #querying for pace, duration, and location
     matches = []
     for match in potential_matches: 
-        match_preferences = match = user.preferences[0]
+        match_preferences = match.user.preferences[0]
+        #if the pace of the user is within 1.5 min of each other: 
         if abs(current_user_pace - match_preferences.mile_time)  < 1.5: 
-            if abs(current_user_duration - match.duration) < 10: 
-                matches.append(match)
-    print matches 
+            # if the duration is within 10 min of each other: 
+            if abs(current_user_duration - match.duration) < 10:
+                # if the location is within a 3 mile radius of one another:
+                match_lon = float(match.lon_coordinates)
+                match_lat = float(match.lat_coordinates)
+                degree_distance = math.sqrt(((lat - match_lat)**2) + ((lon - match_lon)**2))
+                miles_distance = degree_distance * CONSTANT_MI_DEGREE
+                print "miles distance: ", miles_distance
+                if miles_distance < 3.5: 
+                    matches.append(match)
 
-    return jsonify(old_match.json())
+    matches_to_return = {}
+    for match in matches: 
+        if matches_to_return == {}: 
+            matches_to_return['match']= [match.json()]
+        else: 
+            matches_to_return['match'].append(match.json())
+        print "our final matches: " + str(match) + "\n"
+        print "Our json version: " + str(match.json()) + "\n"
+
+# for each match return the jsonified form....
+# FIX ME: rename the match.format_json()
+    return jsonify(matches_to_return)
 
 
 if __name__ == "__main__":
