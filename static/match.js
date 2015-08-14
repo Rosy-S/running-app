@@ -36,12 +36,25 @@ function initialize() {
       var inputs = {"lat": lat, "lon": lon, "duration": matchDuration, "wait_time": matchWaitTime};
 
       $.post('/finding_match', inputs , function(data){
-        console.log("data match", data.match[1]);
+        console.log("data: ", data);
+        console.log("data match", data.match[0]);
+        console.log("data length: ", data.match.length);
+
+        var object = data.match;
+        console.log("object duration: ", object[0]['duration'])
+
+        for (var i = 0; i < data.match.length; i++) {
+
+          $("#result").append('<li>' + object[i]['duration'] + '</li>');         
+        }
+
+
         //data.match is a list of objects. for each item in the list, make div id resulsts, and do the selecter that says
         //look for things taht are in the resulsts, and append onto it some code which is a paragraph
 
 
         // not finished with this function. Need to plan for the duration of the run, getting the user id of person available, and time ending the run. 
+        
 
       });
 
