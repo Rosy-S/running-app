@@ -36,16 +36,34 @@ function initialize() {
       var inputs = {"lat": lat, "lon": lon, "duration": matchDuration, "wait_time": matchWaitTime};
 
       $.post('/finding_match', inputs , function(data){
-        console.log("data: ", data);
-        console.log("data match", data.match[0]);
-        console.log("data length: ", data.match.length);
+        // bases for required bootstrap media object functionality
+        var base1 = "<div class=media-left media-middle'><a href=";
+        var base2 = "><img class='media-object' width=100 src=";
+        var base3 = " alt='profile-pic'></a></div><div class='media-body'><h4 class='media-heading'>";
 
-        var object = data.match;
-        console.log("object duration: ", object[0]['duration'])
+
+        var to_insert;
+        var user_profile_url;
+        var user_img_src;
+        var user_name;
+        var description;
+        var pace; 
+        var duration; 
+        var miles_away; 
 
         for (var i = 0; i < data.match.length; i++) {
 
-          $("#result").append('<li>' + object[i]['duration'] + '</li>');         
+          user_profile_url = '"/matchdetails"';
+          user_img_src = "/static/img/placeholder.img";
+          user_name = data.match[i]['user_nam'];
+          description = data.match[i]['duration'];
+          pace = data.match[i]['pace'];
+           // miles away now, duration, pace
+
+          to_insert = base1 + user_profile_url + base2 + user_img_src + base3 + String(user_name) + "</h4>" + description + pace + "</div>";  
+          console.log(to_insert);      
+
+          $("#result").append(to_insert);         
         }
 
 

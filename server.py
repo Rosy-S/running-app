@@ -1,12 +1,11 @@
 from jinja2 import StrictUndefined
-
+from twilio import twiml
 from flask import Flask, render_template, request, flash, redirect, session, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 
+from model import connect_to_db, db, User, User_Run
+
 import datetime
-
-from model import connect_to_db, db, User, Preference, Match
-
 import re, math
 
 CONSTANT_MI_DEGREE = 69
@@ -55,9 +54,11 @@ def register_process():
     user_name = request.form["user_name"]
     email = request.form["email"]
     password = request.form["password"]
+    mile_time = request.form["mile_time"]
+    phone = request.form["phone"]
 
 
-    new_user = User(user_name=user_name, password=password, email=email)
+    new_user = User(user_name=user_name, password=password, email=email, mile_time=mile_time, phone=phone)
 
     db.session.add(new_user)
     db.session.commit()
@@ -68,28 +69,8 @@ def register_process():
     session["user_id"] = user.user_id
     session["user_name"] = user.user_name
 
-    return render_template("profile_details.html")
-
-@app.route('/confirmation', methods=['POST'])
-def confirmation(): 
-    mile_time = request.form["mile_time"]
-    # gender_preference = request.form["gender_preference"]
-    phone = request.form["phone"]
-    user_id = session['user_id']
-    user = User.query.get(user_id)
-
-    # making preferences for a user
-    preferences = Preference(user_id=user_id, phone=phone, mile_time=mile_time)
-    db.session.add(preferences)
-    db.session.commit()
-    flash("your preferences have been updated! Thanks!")
-
-    # updating gender for a user
-    # gender = request.form["gender"]
-    # user.gender = gender
-    # db.session.commit()
-
     return redirect("/users/%s/%s" % (user.user_id, user.user_name))
+
 
     
 ################LOGING IN ROUTES #####################################
@@ -157,10 +138,6 @@ def scheduling_run(user_id, user_name):
     return render_template('schedule_run.html', duration=duration, wait_time=wait_time)
 
 
-@app.route('/match')
-def match(): 
-    datetime = request.form.get("datetime")
-    return render_template()
 
 
 @app.route('/finding_match', methods=["POST"])
@@ -179,12 +156,22 @@ def finding_match():
 
     # if a the user already has a match existing in the database, update it with the new info. 
     # if not, make a new match. That way, there will always be only one match per user in the Match table.
-    old_match = Match.query.filter_by(user1=session['user_id']).first()
+    old_match = User_Run.query.filter_by(user1=session['user_id']).first()
     if not old_match:
-        old_match = Match(user1=session['user_id'], lat_coordinates=lat, lon_coordinates=lon, time_start=datetime.datetime.now(), time_end=time_end, duration=duration)
+        old_match = User_Run(user1=session['user_id'], lat_coordinates=lat, lon_coordinates=lon, time_start=datetime.datetime.now(), time_end=time_end, duration=duration)
         db.session.add(old_match)
         db.session.commit()
     else: 
+        lst_of_runs = User_Run.query.filter_by(user1=session['user_id']).all()
+        # updating all of the user's User_Run requests to Falsee if they are not the most current subimtted one.
+        for run in lst_of_runs:
+            if run.time_end  < datetime.datetime.now(): 
+                match.active_status = False
+        new_match = User_Run(user1=session['user_id'], lat_coordinates=lat, lon_coordinates=lon, time_start=datetime.datetime.now(), time_end=time_end, duration=duration)
+        db.session.add(new_match)
+        db.session.commit()
+        
+
         old_match.lat_coordinates = lat
         old_match.lon_coordinates = lon
         old_match.time_start = datetime.datetime.now()
@@ -198,41 +185,52 @@ def finding_match():
     #Comparing the match info of the user in the current session to matches in db.
     # Need to compare their gender preferences, pace, duration, time_end, and location.
     current_user = User.query.get(session['user_id'])
-    current_user_pace = current_user.preferences[0].mile_time
+    current_user_pace = current_user.mile_time
     current_user_duration = duration
     current_user_end_time = time_end
     #querying first for all UNEXPIRED possible matches that are not the user itself.
-    potential_matches = Match.query.filter(Match.time_end > datetime.datetime.now(), Match.user1 != current_user.user_id).all()
+    potential_runs = User_Run.query.filter(User_Run.time_end > datetime.datetime.now(), User_Run.user1 != current_user.user_id).all()
 
     #querying for pace, duration, and location
-    matches = []
-    for match in potential_matches: 
-        match_preferences = match.user.preferences[0]
+    runs = []
+    for run in potential_runs: 
+        run_preferences = run.user.mile_time
         #if the pace of the user is within 1.5 min of each other: 
-        if abs(current_user_pace - match_preferences.mile_time)  < 1.5: 
+        if abs(current_user_pace - run.user.mile_time)  < 1.5: 
             # if the duration is within 10 min of each other: 
-            if abs(current_user_duration - match.duration) < 10:
+            if abs(current_user_duration - run.duration) < 15:
                 # if the location is within a 3 mile radius of one another:
-                match_lon = float(match.lon_coordinates)
-                match_lat = float(match.lat_coordinates)
-                degree_distance = math.sqrt(((lat - match_lat)**2) + ((lon - match_lon)**2))
+                run_lon = float(run.lon_coordinates)
+                run_lat = float(run.lat_coordinates)
+                degree_distance = math.sqrt(((lat - run_lat)**2) + ((lon - run_lon)**2))
                 miles_distance = degree_distance * CONSTANT_MI_DEGREE
                 print "miles distance: ", miles_distance
-                if miles_distance < 3.5: 
-                    matches.append(match)
+                if miles_distance < 5: 
+                    runs.append(run)
+    # if matches are empty, skip the whole twilio thing, and go to a page. 
+    #else, pick a match from matches. and send a twilio message, adn then go to the same webpage. 
 
-    matches_to_return = {}
-    for match in matches: 
-        if matches_to_return == {}: 
-            matches_to_return['match']= [match.json()]
+    runs_to_return = {}
+    for run in runs: 
+        run_dictionary = run.json()
+        # getting match user's pace and name and adding it to match_dictionary
+        run_dictionary['pace'] = run.user.mile_time
+        run_dictionary['user name'] = run.user.user_name
+        if runs_to_return == {}:            
+            runs_to_return['match']= [run_dictionary]
         else: 
-            matches_to_return['match'].append(match.json())
-        print "our final matches: " + str(match) + "\n"
-        print "Our json version: " + str(match.json()) + "\n"
+            runs_to_return['match'].append(run_dictionary)
+
+        print "our final matches: " + str(run) + "\n"
+        print "Our json version: " + str(run_dictionary) + "\n"
 
 # for each match return the jsonified form....
 # FIX ME: rename the match.format_json()
-    return jsonify(matches_to_return)
+    return jsonify(runs_to_return)
+
+@app.route('/matchdetails/<int:user1_id>/<int:user2_id>')
+def match(user1_id, user2_id): 
+    return render_template("matchdetails.html")
 
 
 if __name__ == "__main__":

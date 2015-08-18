@@ -1,5 +1,6 @@
 <html>
 <head>
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://code.jquery.com/jquery.js"></script>
 <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true"></script>
  <script src="/static/match.js"></script>
@@ -22,15 +23,21 @@ This is your location right now. Let's find someone close to you that also runs 
 
 <span id="match_data" data-duration="{{duration}}" data-wait-time="{{wait_time}}"></span>
 
-<div id="results">
-	<p> people you are currently matched up with:  </p>
-		<ul id="result">
-			
+<div class="list-group">
+  <a href="#" class="list-group-item active">
+    <h4 class="list-group-item-heading">All possible matches </h4>
+    <p class="list-group-item-text">All possible matches 3 miles from you with similar running pace and duration</p>
+  </a>
+</div>
 
-		</ul>
+<div class='media' id='result'>
 
-</div> 
+
+
+
+
 
 </body>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 </html>
 

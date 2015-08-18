@@ -21,48 +21,22 @@ class User(db.Model):
     user_name = db.Column(db.String(25), nullable=False)
     password = db.Column(db.String(64), nullable=False)
     email = db.Column(db.String(64), nullable=False)
+    phone = db.Column(db.Integer, nullable=True)
+    mile_time = db.Column(db.Integer, nullable=True)
 
-    # Optional info
-
-    # if gender = True, user is female. 
-    # gender = db.Column(db.String(6), nullable=True)
-    # Everything else besides user_name and password is nullable. User only needs those two
-    # things to login and make a profile. If they don't specify mile_time, they don't care who
-    # they get paird with or don't know their miletime. If they don't provide their phone, 
-    # then they don't want to be texted. They can still use the website for pinning.
 
 
     def __repr__(self):
         """Provide helpful representation when printed."""
 
         return "<User user_name=%s email=%s>" % (self.user_name, self.email)
-class Preference(db.Model): 
-    __tablename__ = 'preferences'
-
-    preference_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
-    #Optional contact info
-    phone = db.Column(db.Integer, nullable=True)
-    #Pairing Info
-    mile_time = db.Column(db.Integer, nullable=True)
-    #if True, user is a Female. If False, user is a Male, if blank, user doesn't 
-    # care on who they get paired with or don't want to specify.
-    # gender_preference = db.Column(db.String(3), nullable=True)
-
-    # Define relationship to user
-    user = db.relationship("User",
-                           backref=db.backref("preferences", order_by=user_id))
-    def __repr__(self):
-        """Provide helpful representation when printed."""
-
-        return "<Preferences user_id=%s>" % (self.user_id)
 
 
-class Match(db.Model): 
-    __tablename__ = "matches"
+class User_Run(db.Model): 
+    __tablename__ = "user_runs"
 
-    match_id = db.Column(db.Integer,autoincrement=True, primary_key=True)
-    user1 = db.Column(db.Integer, db.ForeignKey('users.user_id',), unique=True)
+    run_id = db.Column(db.Integer,autoincrement=True, primary_key=True)
+    user1 = db.Column(db.Integer, db.ForeignKey('users.user_id'))
     active_status = db.Column(db.Boolean, nullable=False, default=True)
     lat_coordinates = db.Column(db.Float, nullable=False)
     lon_coordinates = db.Column(db.Float, nullable=False)
@@ -72,11 +46,15 @@ class Match(db.Model):
 
     # Define relationship to user
     user = db.relationship("User",
-                           backref=db.backref("matches", order_by=user1))
+                           backref=db.backref("user_runs", order_by=user1))
+
+    # preferences = db.relationship("Preferences", 
+    #                                 backref=db.backref("preferences", order_by=user1))
+
     def __repr__(self):
         """Provide helpful representation when printed."""
 
-        return "<Match id for user1=%s is %s, time_start=%s>" % (self.user1, self.match_id, self.time_start)
+        return "<User_Run id for user1=%s is %s, time_start=%s>" % (self.user1, self.run_id, self.time_start)
 
     def json(self):
         my_json_representation = {}
@@ -91,10 +69,29 @@ class Match(db.Model):
         # finish adding all the atributes to this json thingie
         return my_json_representation
 
+class Match(db.Model): 
+    __tablename__ = "matches"
+    
+    match_id = db.Column(db.Integer,autoincrement=True, primary_key=True)
+    # asker is the person that is interested in going on a run on the User_Run you made. 
+    asker_id = db.Column(db.Integer, db.ForeignKey('users.user_id',))
+    run_id = db.Column(db.Integer, db.ForeignKey('user_runs.run_id'))
+    asked_at = db.Column(db.DATETIME)
+    viewed = db.Column(db.DATETIME)
+    accepted = db.Column(db.Boolean)
+
+
+    def __repr__(self):
+        """Provide helpful representation when printed."""
+
+        return "<Match id%s is %s, time_start=%s>" % (self.user1, self.run_id, self.time_start)
+
 # class Run(db.Model): 
 #     __tablename__ = "runs"
 
 #     pass
+
+
 
 
 
