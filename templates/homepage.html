@@ -1,4 +1,9 @@
 {% extends 'base.html' %}
+
+{% block head %}
+<script src="/static/homepage.js"></script>
+{% endblock %}
+
 {% block content %}
 
   <h1>HOME PAGE</h1>
@@ -11,8 +16,16 @@
 
 {% else %}
 	<p> You are not currently logged in. </p>
-	
 {% endif %} 
+
+<div class="list-group">
+  <a href="#" class="list-group-item active">
+    <h4 class="list-group-item-heading">All possible runs you can go on </h4>
+    <p class="list-group-item-text">Current runs happening close by: </p>
+  </a>
+</div>
+
+<div class='media' id='result'>
 
 
 {% endblock %}

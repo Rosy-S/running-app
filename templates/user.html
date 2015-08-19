@@ -20,9 +20,15 @@
   <div id='pinterest'></div>
 
   <div id='run-list'>
-   <p> Here is a list of all possible runs happening in your area </p>
+   <p> Here is a list of all possible runs happening in your area:  </p>
    </div>
-	
+   
+	<script> 
+    var test = {{ javascript_object|tojson|safe }};  
+      console.log(test);
+  </script>
+
+
 	<input id='runbutton' type="button" value="I want to run!"/>
 
 	<div style='visibility: hidden' id="runningform">

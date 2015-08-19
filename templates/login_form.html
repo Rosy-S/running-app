@@ -1,4 +1,9 @@
 {% extends 'base.html' %}
+
+{% block head %}
+<script src="/static/login.js"></script>
+{% endblock %}
+
 {% block content %}
 
     <h1>Login</h1>
@@ -15,6 +20,8 @@
                 <input type="password" name="password" required>
             </label>
         </div>
+
+                <p id="location-error"></p>
 
         <div>
             <input type="submit" value="Log In">

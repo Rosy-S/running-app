@@ -33,9 +33,13 @@ app.jinja_env.undefined = StrictUndefined
 
 @app.route('/')
 def index():
-    """Homepage."""
+
+
 
     return render_template("homepage.html")
+
+
+
 
 ########REGISTRATION #####################################
 
@@ -69,8 +73,7 @@ def register_process():
     session["user_id"] = user.user_id
     session["user_name"] = user.user_name
 
-    return redirect("/users/%s/%s" % (user.user_id, user.user_name))
-
+    return redirect("/login")
 
     
 ################LOGING IN ROUTES #####################################
@@ -102,10 +105,25 @@ def login_process():
 
     session["user_id"] = user.user_id
     session["user_name"] = user.user_name
+    # session['lat']  = lat
+    # session['lon'] = lon 
+    # print "session lat: ", lat
+    # print "session lon: ", lon
+    print "our session dictionary: ", session
+
     
 
     flash("Logged in")
     return redirect("/users/%s/%s" % (user.user_id, user.user_name))
+
+@app.route('/meta-login', methods=['POST'])
+def function(): 
+    lat = request.form.get('lat')
+    lon = request.form.get('lon')
+    session['lat']  = lat
+    session['lon'] = lon 
+    print lat, lon 
+    return "success"
 
 
 @app.route('/logout')
@@ -123,13 +141,83 @@ def logout():
 def user_detail(user_id, user_name):
     """Show info about user."""
 
-    user = User.query.get(user_id)
-    user_id = int(user.user_id)
-    user_name = str(user.user_name)
+    current_user = User.query.get(session['user_id'])
+    current_user_id = current_user.user_id 
+    current_user_pace = (current_user.mile_time)
+    user_lat = session['lat']
+    user_lon = session['lon']
+    print "user_lon", user_lon
+    print "user_lat", user_lat
+    expired_runs = User_Run.query.filter(User_Run.time_end < datetime.datetime.now()).all()
+    print "expired_runs: ", expired_runs
+    if expired_runs: 
+        for expired_run in expired_runs: 
+            expired_run.active_status = False
+        db.session.commit()
+    potential_runs = User_Run.query.filter(User_Run.active_status == True, User_Run.user1 != current_user_id).all()
+    print "potential_runs: ", potential_runs
+    #querying for pace, duration, and location
+    final_runs = []
+    final_runs_distance = []
+    for run in potential_runs: 
+        #if the pace of the user is within 1.5 min of each other: 
+        if abs(current_user_pace - run.user.mile_time)  < 1.5: 
+            # if the duration is within 10 min of each other: 
+            run_lon = float(run.lon_coordinates)
+            run_lat = float(run.lat_coordinates)
+            print "run_lon: ", run_lon
+            print "run_lat: ", run_lat
+            degree_distance = math.sqrt(((float(user_lat) - run_lat)**2) + ((float(user_lon) - run_lon)**2))
+            miles_distance = degree_distance * CONSTANT_MI_DEGREE
+            print "miles distance: ", miles_distance
+            if miles_distance < 5: 
+                final_runs.append((run, miles_distance))
+    print "final_runs: ", final_runs
 
-    return render_template("user.html", user_id=user_id, user_name=user_name)
 
 
+    # if matches are empty, skip the whole twilio thing, and go to a page. 
+    #else, pick a match from matches. and send a twilio message, adn then go to the same webpage. 
+
+    runs_to_return = {}
+    if not final_runs: 
+        print "NO current runs.... "
+
+    else:
+        print "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&" 
+        for run, distance in final_runs: 
+            print "RUN: ", run
+            print "Distance: ", distance
+            run_dictionary = run.json()
+            # getting match user's pace and name and adding it to match_dictionary
+            run_dictionary['pace'] = run.user.mile_time
+            run_dictionary['user name'] = run.user.user_name
+            run_dictionary['distance_away'] = distance
+
+            print "our run_dictionary: ", run_dictionary
+
+
+            if runs_to_return == {}:            
+                runs_to_return['match']= [run_dictionary]
+                print "Im in the if"
+            else: 
+                runs_to_return['match'].append(run_dictionary)
+                print "Im in the else"
+            print "runs_to_return: ", runs_to_return
+
+            # print "our final matches: " + str(run) + "\n"
+            # print "Our json version: " + str(run_dictionary) + "\n"
+
+            javascript_object = jsonify(runs_to_return)
+
+            print "our javascript objert: ", javascript_object
+
+
+    # I want to display the list of all possible runs that this user can go on. 
+    # check that list to see if there is any expired runs, and don't display the ones iwth active status = False
+    # how would I do that? I have their user
+
+    return render_template("user.html", user_id=user_id, user_name=user_name, javascript_object=javascript_object)
 
 @app.route('/<int:user_id>/<string:user_name>/schedule_run', methods=['POST'])
 def scheduling_run(user_id, user_name): 
@@ -137,17 +225,12 @@ def scheduling_run(user_id, user_name):
     wait_time = request.form.get("time_amount")
     return render_template('schedule_run.html', duration=duration, wait_time=wait_time)
 
-
-
-
 @app.route('/finding_match', methods=["POST"])
 def finding_match(): 
     print "************************************************"
     # Adding/updating a match column for the user currently in the session.
     lat = float(request.form.get('lat'))
     lon = float(request.form.get('lon'))
-    session['lat'] = lat
-    session['lon'] = lon
     duration = request.form.get("duration")
     duration = int(re.sub("[^0-9]", "", duration))
     wait_time = request.form.get("wait_time")  
@@ -163,10 +246,12 @@ def finding_match():
         db.session.commit()
     else: 
         lst_of_runs = User_Run.query.filter_by(user1=session['user_id']).all()
-        # updating all of the user's User_Run requests to Falsee if they are not the most current subimtted one.
+        # updating all of the user's User_Run requests to False if they are not the most current subimtted one.
         for run in lst_of_runs:
             if run.time_end  < datetime.datetime.now(): 
-                match.active_status = False
+                run.active_status = False
+                db.session.commit()
+            print "active status of match: ", run.active_status
         new_match = User_Run(user1=session['user_id'], lat_coordinates=lat, lon_coordinates=lon, time_start=datetime.datetime.now(), time_end=time_end, duration=duration)
         db.session.add(new_match)
         db.session.commit()
@@ -185,7 +270,7 @@ def finding_match():
     #Comparing the match info of the user in the current session to matches in db.
     # Need to compare their gender preferences, pace, duration, time_end, and location.
     current_user = User.query.get(session['user_id'])
-    current_user_pace = current_user.mile_time
+    current_user_pace = (current_user.mile_time)
     current_user_duration = duration
     current_user_end_time = time_end
     #querying first for all UNEXPIRED possible matches that are not the user itself.
