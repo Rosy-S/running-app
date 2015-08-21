@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title> INBOX </title>
+{% endblock %}
+
+{% block content %}
+<h1> Your Messages </h1>
+
+{ if jinja_content }
+<ul> 
+	<li> {{ jinja_content }} </li>
+</ul>
+
+
+{% endblock %}

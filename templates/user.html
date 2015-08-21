@@ -17,15 +17,37 @@
 
 	<p> This is your profile. Feel free to write down goals, put up images, or anything you feel like here. You can see people close to you that want to run and a list of past runs. If you see no one, you can always click "I want to run!" to make your own run!</p>
 
-  <div id='pinterest'></div>
+    <div id='pinterest'> <a data-pin-do="embedBoard" href="http://www.pinterest.com/fuelrunning/running-quotes/">Follow Pinterest's board Official news on Pinterest.</a></div>
 
-  <div id='run-list'>
-   <p> Here is a list of all possible runs happening in your area:  </p>
-   </div>
-   
+    <!-- Please call pinit.js only once per page -->
+    <script type="text/javascript" async defer src="//assets.pinterest.com/js/pinit.js"></script>
+
+    <div id='run-list'>
+    {% if runs %}
+        <p> Here is a list of all possible runs happening in your area:  </p>
+        </div>
+
+        <ul>
+            {% for run, distance in runs %}
+
+            <li>{{ run.user.user_name}} wants to run! they are currently {{ distance}} away from your location, and they normally run for {{ run.user.mile_time}} minutes. (their run id is {{ run.run_id }})
+            <a href="/choose-run/{{ run.run_id }}">choose this run</a>
+            </li>
+            {% endfor %}        
+        </ul>
+    {% else %}
+        Looks like there are no runs close to you that match your pace! You can always make your own run to get started!
+    {% endif %}
+
+
 	<script> 
-    var test = {{ javascript_object|tojson|safe }};  
-      console.log(test);
+    {# var run_objects = {{ javascript_object|tojson }};  #}
+    if run_objects
+    for (var i = 0; i = run_objects.match.length; i++){
+
+    }
+ 
+
   </script>
 
 

@@ -3,7 +3,7 @@ from twilio import twiml
 from flask import Flask, render_template, request, flash, redirect, session, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 
-from model import connect_to_db, db, User, UserRun, Match
+from model import connect_to_db, db, User, UserRun
 
 import datetime
 import re, math
@@ -154,7 +154,53 @@ def user_detail(user_id, user_name):
             print "miles distance: ", miles_distance
             if miles_distance < 5: 
                 final_runs.append((run, miles_distance))
+    # print "final_runs: ", final_runs
+    # # if matches are empty, skip the whole twilio thing, and go to a page. 
+    # #else, pick a match from matches. and send a twilio message, adn then go to the same webpage. 
 
+    # runs_to_return = {}
+    # if not final_runs: 
+    #     print "NO current runs.... "
+    #     javascript_object = {}
+
+    # else:
+    #     # in this step, we have the list of final runs that are not expired, and that need to show up on the user page.
+    #     # right now they are objects, so we are trying to convert them to json objects that will render in the page and that
+    #     # can be manipulated with JS. 
+    #     print "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&" 
+    #     for run, distance in final_runs: 
+    #         print "RUN: ", run
+    #         print "Distance: ", distance
+    #         run_dictionary = run.json()
+    #         # getting match user's pace and name and adding it to match_dictionary
+    #         run_dictionary['pace'] = run.user.mile_time
+    #         run_dictionary['user name'] = run.user.user_name
+    #         run_dictionary['distance_away'] = distance
+
+    #         print "our run_dictionary: ", run_dictionary
+
+
+    #         if runs_to_return == {}:            
+    #             runs_to_return['match']= [run_dictionary]
+    #             print "Im in the if"
+    #         else: 
+    #             runs_to_return['match'].append(run_dictionary)
+    #             print "Im in the else"
+    #         print "runs_to_return: ", runs_to_return
+    #         print "runs_to_return length : ", len(runs_to_return)
+
+
+    #         # print "our final matches: " + str(run) + "\n"
+    #         # print "Our json version: " + str(run_dictionary) + "\n"
+
+    #         javascript_object = runs_to_return
+
+    #         print "our javascript objert: ", javascript_object
+
+
+    # I want to display the list of all possible runs that this user can go on. 
+    # check that list to see if there is any expired runs, and don't display the ones iwth active status = False
+    # how would I do that? I have their user
 
     return render_template("user.html", user_id=user_id, runs=final_runs, user_name=user_name) # , javascript_object=javascript_object)
 
@@ -167,28 +213,22 @@ def scheduling_run(user_id, user_name):
 
 @app.route("/choose-run/<int:run_id>")
 def choose_run(run_id):
-    print "^^^^^^^^^^^^^^^^^^^^^^^^ making a match ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
     asker_id = session['user_id']
-    recipient = UserRun.query.get(run_id)
-    recipient_id = recipient.user1
-    new_match = Match(asker_id=session['user_id'], recipient_id=recipient_id, run_id=run_id, asked_at=datetime.datetime.now())
-    db.session.add(new_match)
+    recipient = UserRun.query.get(run_id).user1
+    match = Match(asker_id=session['user_id'], recipient_id=recipient_id, run_id=run_id, asked_at=datetime.datetime.now())
+    db.session.add(match)
     db.session.commit()
-    match_info = new_match.make_match_dictionary()
-    match_info['recipient_name'] = recipient.user.user_name
-    print match_info
-
-
+    
 
 
 # @app.route("/choose-run/<int:run_id>")
 # def choose_run(self, run_id):            # get from url like /17
 
-    return render_template("choose_run.html", match_info=match_info)
+    return render_template("choose_run.html")
      
 @app.route('/finding_match', methods=["POST"])
 def finding_match(): 
-    print "******************* making a user run *****************************"
+    print "************************************************"
     # Adding/updating a match column for the user currently in the session.
     lat = float(request.form.get('lat'))
     lon = float(request.form.get('lon'))
@@ -217,19 +257,63 @@ def finding_match():
         db.session.add(new_match)
         db.session.commit()
         
+
+#         old_match.lat_coordinates = lat
+#         old_match.lon_coordinates = lon
+#         old_match.time_start = datetime.datetime.now()
+#         old_match.time_end = time_end
+#         old_match.duration = duration
+#         db.session.commit()
+
+#     # print "new match dictionary: ", old_match.json()
+
+    
+#     #Comparing the match info of the user in the current session to matches in db.
+#     # Need to compare their gender preferences, pace, duration, time_end, and location.
+#     current_user = User.query.get(session['user_id'])
+#     current_user_pace = (current_user.mile_time)
+#     current_user_duration = duration
+#     current_user_end_time = time_end
+#     #querying first for all UNEXPIRED possible matches that are not the user itself.
+#     potential_runs = UserRun.query.filter(UserRun.time_end > datetime.datetime.now(), UserRun.user1 != current_user.user_id).all()
+
+#     #querying for pace, duration, and location
+#     runs = []
+#     for run in potential_runs: 
+#         run_preferences = run.user.mile_time
+#         #if the pace of the user is within 1.5 min of each other: 
+#         if abs(current_user_pace - run.user.mile_time)  < 1.5: 
+#             # if the duration is within 10 min of each other: 
+#             if abs(current_user_duration - run.duration) < 15:
+#                 # if the location is within a 3 mile radius of one another:
+#                 run_lon = float(run.lon_coordinates)
+#                 run_lat = float(run.lat_coordinates)
+#                 degree_distance = math.sqrt(((lat - run_lat)**2) + ((lon - run_lon)**2))
+#                 miles_distance = degree_distance * CONSTANT_MI_DEGREE
+#                 print "miles distance: ", miles_distance
+#                 if miles_distance < 5: 
+#                     runs.append(run)
+#     # if matches are empty, skip the whole twilio thing, and go to a page. 
+#     #else, pick a match from matches. and send a twilio message, adn then go to the same webpage. 
+
+#     runs_to_return = {}
+#     for run in runs: 
+#         run_dictionary = run.json()
+#         # getting match user's pace and name and adding it to match_dictionary
+#         run_dictionary['pace'] = run.user.mile_time
+#         run_dictionary['user name'] = run.user.user_name
+#         if runs_to_return == {}:            
+#             runs_to_return['match']= [run_dictionary]
+#         else: 
+#             runs_to_return['match'].append(run_dictionary)
+
+#         print "our final matches: " + str(run) + "\n"
+#         print "Our json version: " + str(run_dictionary) + "\n"
+
+# # for each match return the jsonified form....
+# # FIX ME: rename the match.format_json()
+#     return jsonify(runs_to_return)
     return "success"
-
-
-@app.route('/inbox/requests/<int:user_id>')
-def show_requests(user_id): 
-    # the user in the session here is the person that is the recipient.
-    possible_matches = Match.query.filter(Match.recipient_id == session['user_id']).all()
-    if not possible_matches: 
-        jinja_content = "no matches for now. Feel free to go to your profile and make as many matches as you would like!"
-    else: 
-        jinja_content = possible_matches
-    return render_template("inbox.html", jinja_content=jinja_content)
-
 
 
 if __name__ == "__main__":

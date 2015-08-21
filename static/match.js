@@ -55,7 +55,7 @@ function initialize() {
 
           user_profile_url = '"/matchdetails"';
           user_img_src = "/static/img/placeholder.img";
-          user_name = data.match[i]['user_nam'];
+          user_name = data.match[i]['user_name'];
           description = data.match[i]['duration'];
           pace = data.match[i]['pace'];
            // miles away now, duration, pace

@@ -32,7 +32,7 @@ class User(db.Model):
 		return "<User user_name=%s email=%s>" % (self.user_name, self.email)
 
 
-class User_Run(db.Model): 
+class UserRun(db.Model): 
 	__tablename__ = "user_runs"
 
 	run_id = db.Column(db.Integer,autoincrement=True, primary_key=True)
@@ -54,7 +54,7 @@ class User_Run(db.Model):
 	def __repr__(self):
 		"""Provide helpful representation when printed."""
 
-		return "<User_Run id for user1=%s is %s, time_start=%s>" % (self.user1, self.run_id, self.time_start)
+		return "<User Run id for user1=%s is %s, time_start=%s>" % (self.user1, self.run_id, self.time_start)
 
 	def json(self):
 		my_json_representation = {}
@@ -73,8 +73,10 @@ class Match(db.Model):
 	__tablename__ = "matches"
 	
 	match_id = db.Column(db.Integer,autoincrement=True, primary_key=True)
-	# asker is the person that is interested in going on a run on the User_Run you made. 
+	# asker is the person that is interested in going on a run on the UserRun you made. 
 	asker_id = db.Column(db.Integer, db.ForeignKey('users.user_id',))
+	# recipient is the person currently viewing the run that is gong to ask the asker to run with them.
+	recipient_id = db.Column(db.Integer)
 	run_id = db.Column(db.Integer, db.ForeignKey('user_runs.run_id'))
 	asked_at = db.Column(db.DATETIME)
 	viewed = db.Column(db.DATETIME)
@@ -84,8 +86,20 @@ class Match(db.Model):
 	user = db.relationship("User",
 						   backref=db.backref("user_matches", order_by=asker_id)) 
 
-	run = db.relationship("User_Run", 
+	run = db.relationship("UserRun", 
 							backref=db.backref("run_matches", order_by=run_id))
+
+	def make_match_dictionary(self): 
+		match_dictionary = {}
+		match_dictionary['match_id'] = self.match_id
+		match_dictionary['asker_id'] = self.asker_id
+		match_dictionary['recipient_id'] = self.recipient_id
+		match_dictionary['run_id'] = self.run_id
+		match_dictionary['asked_at'] = self.asked_at
+		match_dictionary['viewed'] = self.viewed
+		match_dictionary['accepted'] = self.accepted
+
+		return match_dictionary 
 
 
 	def __repr__(self):
