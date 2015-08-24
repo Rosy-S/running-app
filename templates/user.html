@@ -1,5 +1,8 @@
-<html>
-<head>
+{% extends 'base.html' %}
+
+{% block head %}
+
+
     <script src="https://code.jquery.com/jquery.js"></script>
 <!-- 	// <script src="static/moment.js"></script> 
 	// <script src="static/combodate.js"></script> 
@@ -10,9 +13,12 @@
   	<script src="//code.jquery.com/jquery-1.10.2.js"></script>
   	<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
   	<link rel="stylesheet" href="/resources/demos/style.css">
+    <title> Hello User! </title>
 
+{% endblock %}
 
-<body>
+{% block content %}
+
 	<h1>{{ user_name }} </h1>
 
 	<p> This is your profile. Feel free to write down goals, put up images, or anything you feel like here. You can see people close to you that want to run and a list of past runs. If you see no one, you can always click "I want to run!" to make your own run!</p>
@@ -118,7 +124,5 @@ $('#run-list')
 
 
 
-</body>
 
-</head>
-</html>
+{% endblock %}

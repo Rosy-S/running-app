@@ -2,11 +2,15 @@ from jinja2 import StrictUndefined
 from twilio import twiml
 from flask import Flask, render_template, request, flash, redirect, session, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
+from twilio.rest import TwilioRestClient
 
 from model import connect_to_db, db, User, UserRun, Match
 
+
 import datetime
 import re, math
+import os
+
 
 CONSTANT_MI_DEGREE = 69
 
@@ -95,7 +99,8 @@ def login_process():
     session["user_id"] = user.user_id
     session["user_name"] = user.user_name
 
-    print "our session dictionary: ", session
+
+
 
     
 
@@ -108,7 +113,6 @@ def function():
     lon = request.form.get('lon')
     session['lat']  = lat
     session['lon'] = lon 
-    print lat, lon 
     return "success"
 
 
@@ -147,11 +151,8 @@ def user_detail(user_id, user_name):
             # if the duration is within 10 min of each other: 
             run_lon = float(run.lon_coordinates)
             run_lat = float(run.lat_coordinates)
-            print "run_lon: ", run_lon
-            print "run_lat: ", run_lat
             degree_distance = math.sqrt(((float(user_lat) - run_lat)**2) + ((float(user_lon) - run_lon)**2))
             miles_distance = degree_distance * CONSTANT_MI_DEGREE
-            print "miles distance: ", miles_distance
             if miles_distance < 5: 
                 final_runs.append((run, miles_distance))
 
@@ -176,7 +177,6 @@ def choose_run(run_id):
     db.session.commit()
     match_info = new_match.make_match_dictionary()
     match_info['recipient_name'] = recipient.user.user_name
-    print match_info
 
 
 
@@ -212,7 +212,6 @@ def finding_match():
             if run.time_end  < datetime.datetime.now(): 
                 run.active_status = False
                 db.session.commit()
-            print "active status of match: ", run.active_status
         new_match = UserRun(user1=session['user_id'], lat_coordinates=lat, lon_coordinates=lon, time_start=datetime.datetime.now(), time_end=time_end, duration=duration)
         db.session.add(new_match)
         db.session.commit()
@@ -224,11 +223,45 @@ def finding_match():
 def show_requests(user_id): 
     # the user in the session here is the person that is the recipient.
     possible_matches = Match.query.filter(Match.recipient_id == session['user_id']).all()
+    jinja_content ={}
     if not possible_matches: 
-        jinja_content = "no matches for now. Feel free to go to your profile and make as many matches as you would like!"
+        jinja_content['message'] = "no matches for now. Feel free to go to your profile and make as many matches as you would like!"
     else: 
-        jinja_content = possible_matches
+        jinja_content['message'] = "you have %d requests to run!" % (len(possible_matches))
+        jinja_content['matches'] = []
+        for match in possible_matches:
+            run_info = match.run 
+            asker_info = User.query.get(match.asker_id)
+            # we are putting a list of tuples that are the match, and run corresponding to that match that the recipeint made.
+            jinja_content['matches'].append((match, run_info, asker_info))
+            print "jinja_dictionary of matches", jinja_content['matches']
+        jinja_content['possible_matches'] = possible_matches
+    print "our jinja dictionary: ", jinja_content
     return render_template("inbox.html", jinja_content=jinja_content)
+
+
+@app.route('/make_run/confirmation/<int:match_id>')
+def run_confirmation(match_id): 
+    # handling accpting on the match table
+    accepted_match = Match.query.get(match_id)
+    accepted_match.accepted = True
+    asker_number = User.query.get(accepted_match.asker_id).phone
+    asker_name = accepted_match.user.user_name
+    recipeint_number = User.query.get(accepted_match.recipient_id).phone 
+    print "asker number and recipient number: ", asker_number, recipeint_number 
+    client = TwilioRestClient(os.environ['TWILIO_ACCOUNT_SID'], os.environ['TWILIO_AUTH_TOKEN'])
+    message=client.messages.create(from_=os.environ['TWILLIO_NUMBER'], to=recipeint_number, body=("Hello! %s wants to go on the run you posted!") % (asker_name))
+    print message.sid 
+    return "success"
+
+@app.route('/make_run/no-thanks/<int:match_id>')
+def run_rejection(match_id):
+    rejected_match = Match.query.get(match_id)
+    rejected_match.accepted = False
+
+    #handling rejection
+    return "you have rejected"
+
 
 
 

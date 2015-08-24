@@ -75,7 +75,7 @@ class Match(db.Model):
 	match_id = db.Column(db.Integer,autoincrement=True, primary_key=True)
 	# asker is the person that is interested in going on a run on the UserRun you made. 
 	asker_id = db.Column(db.Integer, db.ForeignKey('users.user_id',))
-	# recipient is the person currently viewing the run that is gong to ask the asker to run with them.
+	# recipient is the person who made the Run, that is reciving the message "asker_id wants to run with you!"
 	recipient_id = db.Column(db.Integer)
 	run_id = db.Column(db.Integer, db.ForeignKey('user_runs.run_id'))
 	asked_at = db.Column(db.DATETIME)
