@@ -163,6 +163,12 @@ def user_detail(user_id, user_name):
 def scheduling_run(user_id, user_name): 
     duration = request.form.get("amount")
     wait_time = request.form.get("time_amount")
+    date = request.form.get("datepicker")
+    time = request.form.get("time")
+    print "DATE: ", date
+    print "TYPE DATE: ", type(date)
+    print "TIME: ", time
+    print "TYPE TIME: ", type(time)
     return render_template('schedule_run.html', duration=duration, wait_time=wait_time)
 
 
@@ -222,7 +228,12 @@ def finding_match():
 @app.route('/inbox/requests/<int:user_id>')
 def show_requests(user_id): 
     # the user in the session here is the person that is the recipient.
-    possible_matches = Match.query.filter(Match.recipient_id == session['user_id']).all()
+    #FIX ME: query for datetimes after the datetime.datetime.now()
+    preliminary_matches = Match.query.filter(Match.recipient_id == session['user_id']).all()
+    possible_matches = []
+    for match in preliminary_matches: 
+        if match.run.time_end > datetime.datetime.now(): 
+            possible_matches.append(match)
     jinja_content ={}
     if not possible_matches: 
         jinja_content['message'] = "no matches for now. Feel free to go to your profile and make as many matches as you would like!"
@@ -234,7 +245,6 @@ def show_requests(user_id):
             asker_info = User.query.get(match.asker_id)
             # we are putting a list of tuples that are the match, and run corresponding to that match that the recipeint made.
             jinja_content['matches'].append((match, run_info, asker_info))
-            print "jinja_dictionary of matches", jinja_content['matches']
         jinja_content['possible_matches'] = possible_matches
     print "our jinja dictionary: ", jinja_content
     return render_template("inbox.html", jinja_content=jinja_content)
@@ -261,6 +271,10 @@ def run_rejection(match_id):
 
     #handling rejection
     return "you have rejected"
+
+@app.route('/test')
+def test(): 
+    return render_template('test.html')
 
 
 

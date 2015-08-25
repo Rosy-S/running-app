@@ -4,15 +4,13 @@
 
 
     <script src="https://code.jquery.com/jquery.js"></script>
-<!-- 	// <script src="static/moment.js"></script> 
-	// <script src="static/combodate.js"></script> 
- //  	<script src="static/user.js"></script> -->
+
 
 
   	<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
   	<script src="//code.jquery.com/jquery-1.10.2.js"></script>
   	<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-  	<link rel="stylesheet" href="/resources/demos/style.css">
+    <script src="/static/bootstrap-timepicker.js"></script>
     <title> Hello User! </title>
 
 {% endblock %}
@@ -23,15 +21,13 @@
 
 	<p> This is your profile. Feel free to write down goals, put up images, or anything you feel like here. You can see people close to you that want to run and a list of past runs. If you see no one, you can always click "I want to run!" to make your own run!</p>
 
-    <div id='pinterest'> <a data-pin-do="embedBoard" href="http://www.pinterest.com/fuelrunning/running-quotes/">Follow Pinterest's board Official news on Pinterest.</a></div>
+    <div id='pinterest'> </div>
 
-    <!-- Please call pinit.js only once per page -->
-    <script type="text/javascript" async defer src="//assets.pinterest.com/js/pinit.js"></script>
 
     <div id='run-list'>
     {% if runs %}
         <p> Here is a list of all possible runs happening in your area:  </p>
-        </div>
+    </div>
 
         <ul>
             {% for run, distance in runs %}
@@ -46,34 +42,32 @@
     {% endif %}
 
 
-	<script> 
-    {# var run_objects = {{ javascript_object|tojson }};  #}
-    if run_objects
-    for (var i = 0; i = run_objects.match.length; i++){
-
-    }
- 
-
-  </script>
-
-
-	<input id='runbutton' type="button" value="I want to run!"/>
+	<input id='runbutton' type="button" value="I want to run now!"/>
 
 	<div style='visibility: hidden' id="runningform">
 		Great! let's get down your details:
 		<form action="/{{user_id}}/{{user_name}}/schedule_run" method="POST">
-  				<label for="amount">How long do you want to run for? (5 min increments)</label>
+  		<label for="amount">How long do you want to run for? (5 min increments)</label>
 		    <div id="slider">
-            </div>
-            	<p>
-  				<input type="text" id="amount" name="amount" readonly style="border:0; color:#f6931f; font-weight:bold;">
+        </div>
+        <p>
+  			<input type="text" id="amount" name="amount" readonly style="border:0; color:#f6931f; font-weight:bold;">
 				</p>
 
-            <label for="time_amount"> We do our best to match you asap. If you have any time constraints on the amount of time it takes for a match, please specify and we will cancel your request after that time if there is no match. </label>
-            <div id="time_slider"> </div>
-            <p>
-            <input type="text" id="time_amount" name="time_amount" readonly style="border:0; color:#f6931f; font-weight:bold;">
-			</p>
+        <label for="time_amount"> We do our best to match you asap. If you have any time constraints on the amount of time it takes for a match, please specify and we will cancel your request after that time if there is no match. </label>
+        	<div id="time_slider"> </div>
+        	<p>
+          <input type="text" id="time_amount" name="time_amount" readonly style="border:0; color:#f6931f; font-weight:bold;">
+			    </p>
+
+
+      <label for="datepicker"> You can also schedule a date and time to run below </label>
+
+        <p>Date: <input type="text" id="datepicker" name="datepicker" size="30"></p>
+
+      <label> Choose a time: </label>
+      <input type="text" placeholder="format is 5:45 PM" name="time">
+
 
         	<div>
             	<input type="submit" value="I'm ready to run!">
@@ -83,10 +77,26 @@
 	</div>
 
 
-<script>
-$('#run-list')
 
+
+<script type="text/javascript">
+  $('#timepicker1').timepicker();
 </script>
+
+
+<script>
+  $(function() {
+    $( "#datepicker" ).datepicker();
+    $( "#fold" ).change(function() {
+      $( "#datepicker" ).datepicker( "option", "showAnim", $( this ).val() );
+
+      var currentDate = $("#datepicker").datepicker("getDate");
+      
+    });
+  });
+</script>
+
+
 
 <script>
 	

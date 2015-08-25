@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% block head %}
+
 <title> INBOX </title>
 {% endblock %}
 
@@ -14,11 +15,11 @@
 {% else %}
 
 <p> {{jinja_content['message'] }} </p>
-{% for match, run_info, asker_info in jinja_content['matches'] %}
 <ul>
+{% for match, run_info, asker_info in jinja_content['matches'] %}
 <li> {{ asker_info.user_name }} wants to join you on the run that you created! Running at a  {{ asker_info.mile_time }} min/mile, and running for around {{ run_info.duration }} minutes <a href="/make_run/confirmation/{{match.match_id }}"> Click here to accept and send them a text! </a> or <a href="/make_run/no-thanks/{{ match.match_id}}"> decline </a></li>
-</ul>
 {% endfor %}
+</ul>
 
 
 {% endif %}

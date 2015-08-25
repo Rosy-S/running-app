@@ -14,16 +14,21 @@
 	height: 75%;
 	margin: 3;
 	padding: 0;
+	width: 75%;
+}
+
+.hidden {
+	display: none;
 }
 </style>
 
 <div id="map-canvas"></div>
 
-This is your location right now. Let's find someone close to you that also runs at relatively the same pace. 
+This is your location right now. Drag the marker to the location where you want to start your run. 
 
 <span id="match_data" data-duration="{{duration}}" data-wait-time="{{wait_time}}"></span>
 
-<div class="list-group">
+<div class="list-group hidden">
   <a href="#" class="list-group-item active">
     <h4 class="list-group-item-heading">All possible matches </h4>
     <p class="list-group-item-text">All possible matches 3 miles from you with similar running pace and duration</p>
@@ -31,6 +36,9 @@ This is your location right now. Let's find someone close to you that also runs 
 </div>
 
 <div class='media' id='result'>
+</div>
+
+<button id='runbutton'> Finished! </button>
 
 
 
