@@ -4,13 +4,26 @@
 
 
     <script src="https://code.jquery.com/jquery.js"></script>
-
+    <script src="/static/usermap.js"></script>
 
 
   	<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
   	<script src="//code.jquery.com/jquery-1.10.2.js"></script>
   	<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
     <script src="/static/bootstrap-timepicker.js"></script>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <style>
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      #map {
+        height: 50%;
+        width: 50%;
+      }
+    </style>
     <title> Hello User! </title>
 
 {% endblock %}
@@ -26,7 +39,7 @@
 
     <div id='run-list'>
     {% if runs %}
-        <p> Here is a list of all possible runs happening in your area:  </p>
+        <h2> possible runs:   </h2>
     </div>
 
         <ul>
@@ -37,6 +50,7 @@
             </li>
             {% endfor %}        
         </ul>
+      	<div id="map"></div>
     {% else %}
         Looks like there are no runs close to you that match your pace! You can always make your own run to get started!
     {% endif %}
@@ -131,6 +145,9 @@
   });
 
 </script>
+
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?signed_in=true&callback=initMap"></script>
 
 
 
