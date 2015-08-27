@@ -39,15 +39,23 @@
 
     <div id='run-list'>
     {% if runs %}
-        <h2> possible runs:   </h2>
+        <h2> possible runs:</h2>
     </div>
 
         <ul>
             {% for run, distance in runs %}
 
-            <li>{{ run.user.user_name}} wants to run! they are currently {{ distance}} away from your location, and they normally run for {{ run.user.mile_time}} minutes. (their run id is {{ run.run_id }})
+            <li><span class="marker"
+            	data-lat="{{run.lat_coordinates|string}}"
+            	data-lon="{{run.lon_coordinates|string}}"
+            	data-name="{{run.user.user_name}}"
+            	data-duration="{{run.duration|string}}"
+            	data-miletime="{{run.user.mile_time}}">
+            </span>{{ run.user.user_name}} wants to run! they are currently {{ distance}} away from your location, and they normally run for {{ run.user.mile_time}} minutes. (their run id is {{ run.run_id }})
             <a href="/choose-run/{{ run.run_id }}">choose this run</a>
             </li>
+           
+
             {% endfor %}        
         </ul>
       	<div id="map"></div>
@@ -56,7 +64,8 @@
     {% endif %}
 
 
-	<input id='runbutton' type="button" value="I want to run now!"/>
+	<input id='runbutton' type="button" value="run now!"/>
+
 
 	<div style='visibility: hidden' id="runningform">
 		Great! let's get down your details:
@@ -86,6 +95,7 @@
         	<div>
             	<input type="submit" value="I'm ready to run!">
         	</div>
+  
 
 		</form>	
 	</div>
@@ -146,8 +156,7 @@
 
 </script>
 
-    <script async defer
-        src="https://maps.googleapis.com/maps/api/js?signed_in=true&callback=initMap"></script>
+
 
 
 

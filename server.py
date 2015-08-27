@@ -176,16 +176,20 @@ def scheduling_run(user_id, user_name):
 def choose_run(run_id):
     print "^^^^^^^^^^^^^^^^^^^^^^^^ making a match ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
     asker_id = session['user_id']
+    asker_name = User.query.get(asker_id).user_name
     recipient = UserRun.query.get(run_id)
     recipient_id = recipient.user1
+    recipient_number = User.query.get(recipient_id).phone
     new_match = Match(asker_id=session['user_id'], recipient_id=recipient_id, run_id=run_id, asked_at=datetime.datetime.now())
     db.session.add(new_match)
     db.session.commit()
     match_info = new_match.make_match_dictionary()
     match_info['recipient_name'] = recipient.user.user_name
+    # send a text to person who did the run app (test in this case) to check their email box.
 
-
-
+    client = TwilioRestClient(os.environ['TWILIO_ACCOUNT_SID'], os.environ['TWILIO_AUTH_TOKEN'])
+    message=client.messages.create(from_=os.environ['TWILLIO_NUMBER'], to=recipient_number, body=("Hey there! %s wants to go on the run you posted! Login and check your ibox to confirm!") % (asker_name))
+    print "Twilio confirmation message: ", message.sid 
 
 # @app.route("/choose-run/<int:run_id>")
 # def choose_run(self, run_id):            # get from url like /17
@@ -204,8 +208,7 @@ def finding_match():
     wait_time = int(re.sub("[^0-9]", "", wait_time))  
     time_end = datetime.datetime.now() + datetime.timedelta(minutes=wait_time) 
 
-    # if a the user already has a match existing in the database, update it with the new info. 
-    # if not, make a new match. That way, there will always be only one match per user in the Match table.
+
     existing_match = UserRun.query.filter_by(user1=session['user_id']).first()
     if not existing_match:
         new_match = UserRun(user1=session['user_id'], lat_coordinates=lat, lon_coordinates=lon, time_start=datetime.datetime.now(), time_end=time_end, duration=duration)
@@ -258,9 +261,10 @@ def run_confirmation(match_id):
     asker_number = User.query.get(accepted_match.asker_id).phone
     asker_name = accepted_match.user.user_name
     recipeint_number = User.query.get(accepted_match.recipient_id).phone 
+    recipient_name = User.query.get(accepted_match.recipient_id).user_name
     print "asker number and recipient number: ", asker_number, recipeint_number 
     client = TwilioRestClient(os.environ['TWILIO_ACCOUNT_SID'], os.environ['TWILIO_AUTH_TOKEN'])
-    message=client.messages.create(from_=os.environ['TWILLIO_NUMBER'], to=recipeint_number, body=("Hello! %s wants to go on the run you posted!") % (asker_name))
+    message=client.messages.create(from_=os.environ['TWILLIO_NUMBER'], to=asker_number, body=("Hello! %s got the message that you want to run with them! You are running with them at the time specified! Have fun!") % (recipient_name))
     print message.sid 
     return "success"
 

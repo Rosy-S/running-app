@@ -1,66 +1,86 @@
 
 var map;
+var markers;
+var markerObjects;
+var infos = [];
 
-	function initMap() {
-	  var map = new google.maps.Map(document.getElementById('map'), {
-	    zoom: 10,
-	    center: {lat: 37.773972, lng: -122.431297}
-	  });
+// $(document).on('ready', function(){
+function initMap() {
 
-	  setMarkers(map);
-	}
+  	map = new google.maps.Map(document.getElementById('map'), {
+    	zoom: 12,
+    	center: {lat: 37.773972, lng: -122.431297}
+  	});
 
-	// Data for the markers consisting of a name, a LatLng and a zIndex for the
+  // setMarkers(map);
+
+	// Data for the markers consisting of a name, a LatLng and a Index for the
 	// order in which these markers should display on top of each other.
-	var markerObjects = [];
-	var markers = $(".marker")
-	for(var i, i++, markers.length){
-		var data = $(markers[i]).data();
-		markerObjects.push(data);
-		//Google maps API FN tn add multi markers
-	}
-	var beaches = [
-	  ['Bondi Beach', -33.890542, 151.274856, 4],
-	  ['Coogee Beach', -33.923036, 151.259052, 5],
-	  ['Cronulla Beach', -34.028249, 151.157507, 3],
-	  ['Manly Beach', -33.80010128657071, 151.28747820854187, 2],
-	  ['Maroubra Beach', -33.950198, 151.259302, 1]
-	];
+	markers = $(".marker");
+	markerObjects = [];
+	for(var i = 0; i < markers.length; i++){
+		var markerData = $(markers[i]).data();
 
-	function setMarkers(map) {
-	  // Adds markers to the map.
+		var contentString = (
+			'<div id="content">'+
+      		'<div id="siteNotice">'+
+      		'</div>'+
+      		'<h1 id="firstHeading" class="firstHeading">' + 'Run Details for ' + markerData.name + '</h1>' + 
+      		'<div id="bodyContent">'+
+      			'<ul><li> Duration: ' + markerData.duration + '</li>' +
+      			'<li> Runner mile time: ' + markerData.miletime + ' min per mile' + '</li>'  +  
+      		'</ul></div>' +
+      		'</div>');
 
-	  // Marker sizes are expressed as a Size of X,Y where the origin of the image
-	  // (0,0) is located in the top left of the image.
+		//creating Info Window
+		var infoWindow = new google.maps.InfoWindow({
+			content: contentString
+		});
+		console.log("INFO WINDOW: ");
+		console.log(infoWindow);
+		//putting Info Windows in one place
+		infos.push(infoWindow)
 
-	  // Origins, anchor positions and coordinates of the marker increase in the X
-	  // direction to the right and in the Y direction down.
-	  // var image = {
-	  //   url: 'images/beachflag.png',
-	  //   // This marker is 20 pixels wide by 32 pixels high.
-	  //   size: new google.maps.Size(20, 32),
-	  //   // The origin for this image is (0, 0).
-	  //   origin: new google.maps.Point(0, 0),
-	  //   // The anchor for this image is the base of the flagpole at (0, 32).
-	  //   anchor: new google.maps.Point(0, 32)
-	  // };
-	  // // Shapes define the clickable region of the icon. The type defines an HTML
-	  // // <area> element 'poly' which traces out a polygon as a series of X,Y points.
-	  // // The final coordinate closes the poly by connecting to the first coordinate.
-	  // var shape = {
-	  //   coords: [1, 1, 1, 20, 18, 20, 18, 1],
-	  //   type: 'poly'
-	  // };
-	  for (var i = 0; i < beaches.length; i++) {
-	    var beach = beaches[i];
-	    var marker = new google.maps.Marker({
-	      position: {lat: beach[1], lng: beach[2]},
-	      map: map,
-	      // icon: image,
-	      // shape: shape,
-	      title: beach[0],
-	      zIndex: beach[3]
-	    });
-	  }
-	}
+      
+		// markerObjects.push(data);
+
+	// }
+
+	// for (var i = 0; i <= markerObjects.length; i++) {
+
+		//making our markers
+    	// var mapData = markerObjects[i];
+    	var marker = new google.maps.Marker({
+      	position: {lat: markerData['lat'], lng: markerData['lon']},
+      	map: map,
+      	animation: google.maps.Animation.DROP,
+      	// icon: image,
+      	// shape: shape,
+      	title: "map of possible runs",
+      	// zIndex: beach[3]
+    	});
+
+    	// adding event listeners for our markers
+    	bindinfoWindow(marker, map, infoWindow, contentString);
+  	} // End of the for loop
+
+
+} // End of inItMap function.
+
+function bindinfoWindow(marker, map, infoWindow, html) {
+	google.maps.event.addListener(marker, 'click', function() {
+// Set infoWindow content and open it when user clicks.
+closeInfos();
+infoWindow.setContent(html);
+infoWindow.open(map, marker);
+});
+}
+
+function closeInfos() {
+        for (i = 0; i < infos.length; i++) {
+           	infos[i].close();
+        }
+}
+
+google.maps.event.addDomListener(window, 'load', initMap);
 
