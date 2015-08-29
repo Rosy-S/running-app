@@ -19,9 +19,9 @@
 <body>
 
 
-Welcome 
-{% if "user_id" in session %} 
 
+{% if "user_id" in session %} 
+    Hello there {{session.user_name}}!
     <a href="/logout">Logout</a>
 
     or 

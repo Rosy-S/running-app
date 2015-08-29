@@ -81,7 +81,10 @@ function findMatch (evt){
   var draggedLon = marker.position.K;
   var matchDuration = $('#match_data').data('duration');
   var matchWaitTime = $('#match_data').data('wait-time');
-  var inputs = {"lat": draggedLat, "lon": draggedLon, "duration": matchDuration, "wait_time": matchWaitTime};
+  var matchScheduled = $('#match_data').data('scheduled');
+  var matchDate = $('#match_data').data('date');
+  var matchTime = $('#match_data').data('time');
+  var inputs = {"lat": draggedLat, "lon": draggedLon, "duration": matchDuration, "wait_time": matchWaitTime, "scheduled": matchScheduled, "date": matchDate, "time": matchTime};
 
   $.post('/finding_match', inputs , function(data){
     // bases for required bootstrap media object functionality

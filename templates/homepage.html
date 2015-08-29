@@ -6,18 +6,20 @@
 
 {% block content %}
 
-  <h1>HOME PAGE</h1>
+  <h1>Run Away With Me</h1>
 
 {% if "user_id" in session and "user_name" in session %} 
 
-	 <p> {{session.user_id}}, {{session.user_name}} is currently logged in. </p>
+<!-- 	 <p> {{session.user_id}}, {{session.user_name}} is currently logged in. </p> -->
 
-<!-- 	 <a href="/users/{{session['user_id']}}/{{session['user_name']}}"> go to your profile </a> --> 
 
 {% else %}
 	<p> You are not currently logged in. </p>
 {% endif %} 
 
+
+<p> Run Away With Me seeks to inspire you to lead a healthy lifestyle within a community. If you have ever found yourself wanting to go on a run but losing motivation, or wanting to exercise with someone else, Run Away With Me helps you make that idea concrete and connect with others. Whether you want to run right now, schedule a time to run later, run by the beach, etc,  Run Away With me will find someone within 5 miles that matches your mile time, and will notify you via text and on the web whenever you have a match. </p>
+<!-- 
 <div class="list-group">
   <a href="#" class="list-group-item active">
     <h4 class="list-group-item-heading">All possible runs you can go on </h4>
@@ -25,7 +27,7 @@
   </a>
 </div>
 
-<div class='media' id='result'>
+<div class='media' id='result'> -->
 
 
 {% endblock %}

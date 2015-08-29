@@ -3,6 +3,7 @@
 <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://code.jquery.com/jquery.js"></script>
 <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
  <script src="/static/match.js"></script>
 </head>
 <body>
@@ -26,7 +27,7 @@
 
 This is your location right now. Drag the marker to the location where you want to start your run. 
 
-<span id="match_data" data-duration="{{duration}}" data-wait-time="{{wait_time}}"></span>
+<span id="match_data" data-duration="{{duration}}" data-wait-time="{{wait_time}}" data-scheduled="{{scheduled}}" data-date="{{date}}" data-time="{{time}}"></span>
 
 <div class="list-group hidden">
   <a href="#" class="list-group-item active">
@@ -46,6 +47,5 @@ This is your location right now. Drag the marker to the location where you want 
 
 
 </body>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 </html>
 

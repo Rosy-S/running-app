@@ -4,6 +4,23 @@ var markers;
 var markerObjects;
 var infos = [];
 
+function formatAMPM(date) {
+  var month = date.getMonth();
+  console.log("MONTH: ", month);
+  var day = date.getDay();
+  console.log("DAY: ", day);
+  var year = date.getFullYear();
+  console.log("YEAR: ", year);
+  var hours = date.getHours();
+  var minutes = date.getMinutes();
+  var ampm = hours >= 12 ? 'pm' : 'am';
+  hours = hours % 12;
+  hours = hours ? hours : 12; // the hour '0' should be '12'
+  minutes = minutes < 10 ? '0'+minutes : minutes;
+  var strTime = month + "/" + day + "/" + year + " " + hours + ':' + minutes + ' ' + ampm;
+  return strTime;
+}
+
 // $(document).on('ready', function(){
 function initMap() {
 
@@ -21,14 +38,25 @@ function initMap() {
 	for(var i = 0; i < markers.length; i++){
 		var markerData = $(markers[i]).data();
 
+    var timeDate = new Date(markerData.startdate);
+    var current = new Date();
+    console.log(current);
+    if (current > timeDate){
+      timeDate = "<span style='color: red'><strong>now!</strong></span>";
+    } else {
+      timeDate = formatAMPM(timeDate)
+    }
+
+
 		var contentString = (
 			'<div id="content">'+
       		'<div id="siteNotice">'+
       		'</div>'+
-      		'<h1 id="firstHeading" class="firstHeading">' + 'Run Details for ' + markerData.name + '</h1>' + 
+      		'<h3 id="firstHeading" class="firstHeading">' + 'Run Details for ' + markerData.name + '</h3>' + 
       		'<div id="bodyContent">'+
-      			'<ul><li> Duration: ' + markerData.duration + '</li>' +
-      			'<li> Runner mile time: ' + markerData.miletime + ' min per mile' + '</li>'  +  
+            '<ul><li> Time of run: ' + timeDate + '</li>' +
+            '<li> Duration: ' + markerData.duration + ' minutes</li>' +
+            '<li> Runner mile time: ' + markerData.miletime + ' min per mile' + '</li>'  +  
       		'</ul></div>' +
       		'</div>');
 

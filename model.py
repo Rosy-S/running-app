@@ -40,11 +40,12 @@ class UserRun(db.Model):
 	active_status = db.Column(db.Boolean, nullable=False, default=True)
 	lat_coordinates = db.Column(db.Float, nullable=False)
 	lon_coordinates = db.Column(db.Float, nullable=False)
+	scheduled = db.Column(db.Boolean, default=False)
 	#time_start can be two things. it can be the start time for the runs happening instantaneously, 
 	# and it can be the time the run was created for the runs that are going to be sheduled.
-	time_start = db.Column(db.DATETIME, default=datetime.datetime.now())
+	time_start = db.Column(db.DATETIME, nullable=False)
 	# scheduled_time = db.Column(db.DATETIME)
-	time_end = db.Column(db.DATETIME)
+	time_end = db.Column(db.DATETIME, nullable=False)
 	duration = db.Column(db.Integer)
 
 	# Define relationship to user
@@ -99,7 +100,6 @@ class Match(db.Model):
 		match_dictionary['recipient_id'] = self.recipient_id
 		match_dictionary['run_id'] = self.run_id
 		match_dictionary['asked_at'] = self.asked_at
-		match_dictionary['viewed'] = self.viewed
 		match_dictionary['accepted'] = self.accepted
 
 		return match_dictionary 
