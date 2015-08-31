@@ -215,8 +215,10 @@ def finding_match():
 	else: 
 		full_time = date + "/" + time[:2] + '/' + time[3:5] +  time[6:8]
 		time_start = datetime.datetime.strptime(full_time, "%m/%d/%Y/%I/%M%p")
+	
 	time_end = time_start + datetime.timedelta(minutes=wait_time)
 	existing_match = UserRun.query.filter_by(user1=session['user_id']).first()
+
 	if not existing_match:
 		new_match = UserRun(user1=session['user_id'], lat_coordinates=lat, lon_coordinates=lon, time_start=time_start, time_end=time_end, duration=duration)
 		db.session.add(new_match)
@@ -228,7 +230,7 @@ def finding_match():
 			if run.time_end  < datetime.datetime.now(): 
 				run.active_status = False
 				db.session.commit()
-		new_match = UserRun(user1=session['user_id'], lat_coordinates=lat, lon_coordinates=lon, time_start=datetime.datetime.now(), time_end=time_end, duration=duration)
+		new_match = UserRun(user1=session['user_id'], lat_coordinates=lat, lon_coordinates=lon, time_start=time_start, time_end=time_end, duration=duration)
 		db.session.add(new_match)
 		db.session.commit()
 		
@@ -245,7 +247,7 @@ def show_requests(user_id):
 	preliminary_matches = Match.query.filter(Match.recipient_id == session['user_id']).all()
 	possible_matches = []
 	for match in preliminary_matches: 
-		if match.run.time_end > datetime.datetime.now(): 
+		if (match.run.time_end > datetime.datetime.now()) and (match.accepted != False): 
 			possible_matches.append(match)
 	jinja_content ={}
 	if not possible_matches: 
@@ -258,8 +260,12 @@ def show_requests(user_id):
 			asker_info = User.query.get(match.asker_id)
 			# we are putting a list of tuples that are the match, and run corresponding to that match that the recipeint made.
 			jinja_content['matches'].append((match, run_info, asker_info))
-		jinja_content['possible_matches'] = possible_matches
-	print "our jinja dictionary: ", jinja_content
+	print "our jinja matches: ", jinja_content['matches']
+	for match in jinja_content['matches']:
+		print "asker info: ", asker_info.user_name
+		print "Run info: ", run_info.time_start
+		print "run duration: ", run_info.duration
+
 	return render_template("inbox.html", jinja_content=jinja_content)
 
 
@@ -296,7 +302,7 @@ def test():
 if __name__ == "__main__":
 	# We have to set debug=True here, since it has to be True at the point
 	# that we invoke the DebugToolbarExtension
-	app.debug = True
+	app.debug = False
 
 	connect_to_db(app)
 

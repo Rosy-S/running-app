@@ -1,13 +1,12 @@
 <!doctype html>
 <html>
 <head>
-<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://code.jquery.com/jquery.js"></script>
-
-<script src="/static/combodate.js"></script> 
-<script src='https://api.mapbox.com/mapbox.js/v2.2.1/mapbox.js'></script>
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true"></script>
-<link href='https://api.mapbox.com/mapbox.js/v2.2.1/mapbox.css' rel='stylesheet' />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 {% block head %}
 
     <title>GET FIT</title>
@@ -18,27 +17,48 @@
 
 <body>
 
-
-
 {% if "user_id" in session %} 
-    Hello there {{session.user_name}}!
-    <a href="/logout">Logout</a>
 
-    or 
-
-    <a href="/users/{{session['user_id']}}/{{session['user_name']}}"> go to your profile </a>
-
-    Check out your <a href="/inbox/requests/{{ session['user_id'] }}"> inbox/requests </a>
-
-
-	
+    <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#">Run Away With Me</a>
+            </div>
+            <div>
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="/">Home</a></li>
+                    <li><a href="/users/{{session['user_id']}}/{{session['user_name']}}">Profile</a></li>
+                    <li><a href="/inbox/requests/{{ session['user_id'] }}">Inbox</a></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="/logout"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
 {% else %}
-    <a href="/login">Login</a> or 
-    <a href="/register"> Register</a>
-{% endif %} 
 
-<hr>
+
+    <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#">Run Away With Me</a>
+            </div>
+            <div>
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="#">Home</a></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="/register"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
+                    <li><a href="/login"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    
+{% endif %} 
 
 {% for flash in get_flashed_messages() %}
   {{ flash }}
@@ -49,5 +69,4 @@
 {% endblock %}
 
 </body>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 </html>

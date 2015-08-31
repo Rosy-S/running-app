@@ -4,10 +4,13 @@ var markers;
 var markerObjects;
 var infos = [];
 
+var monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+];
+
 function formatAMPM(date) {
-  var month = date.getMonth();
+  var month = monthNames[date.getMonth()];
   console.log("MONTH: ", month);
-  var day = date.getDay();
+  var day = date.getDate();
   console.log("DAY: ", day);
   var year = date.getFullYear();
   console.log("YEAR: ", year);
@@ -17,7 +20,7 @@ function formatAMPM(date) {
   hours = hours % 12;
   hours = hours ? hours : 12; // the hour '0' should be '12'
   minutes = minutes < 10 ? '0'+minutes : minutes;
-  var strTime = month + "/" + day + "/" + year + " " + hours + ':' + minutes + ' ' + ampm;
+  var strTime = month + "/" + day + "/" + year + " at " + hours + ':' + minutes + ' ' + ampm;
   return strTime;
 }
 
@@ -39,13 +42,16 @@ function initMap() {
 		var markerData = $(markers[i]).data();
 
     var timeDate = new Date(markerData.startdate);
+  
     var current = new Date();
-    console.log(current);
+
     if (current > timeDate){
       timeDate = "<span style='color: red'><strong>now!</strong></span>";
     } else {
-      timeDate = formatAMPM(timeDate)
+      timeDate = formatAMPM(timeDate);
+  
     }
+
 
 
 		var contentString = (
@@ -64,8 +70,7 @@ function initMap() {
 		var infoWindow = new google.maps.InfoWindow({
 			content: contentString
 		});
-		console.log("INFO WINDOW: ");
-		console.log(infoWindow);
+
 		//putting Info Windows in one place
 		infos.push(infoWindow)
 
