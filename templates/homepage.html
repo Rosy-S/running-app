@@ -2,33 +2,42 @@
 
 {% block head %}
 <script src="/static/homepage.js"></script>
+<link href="/static/css/style.css" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
-	<div class="container-fluid">
+<body>
 
- 	<h1>Run Away With Me</h1>
 
 {% if "user_id" in session and "user_name" in session %} 
 
-<!-- 	 <p> {{session.user_id}}, {{session.user_name}} is currently logged in. </p> -->
-
-
-{% else %}
-	<p> You are not currently logged in. </p>
 {% endif %} 
 
+<div class="container black-box">
+	<div class="row">
+		<div>
+			<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 left">
+				<h1 id="h1left">Run Away</h1>
+				<p> Run Away With Me seeks to inspire you to lead a healthy lifestyle within a community. If you have ever found yourself wanting to go on a run but losing motivation, or wanting to exercise with someone else, Run Away With Me helps you make that idea concrete and connect with others. Whether you want to run right now, schedule a time to run later, run by the beach, etc,  Run Away With me will find someone within 5 miles that matches your mile time, and will notify you via text and on the web whenever you have a match. </p>
+			</div>
+		</div>
+		<div>
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 right">
+                <h1 id="h1right"> With Me </h1>	
+                <div class="col-md-4 col-md-offset-3">
+                	<h2 id="signup">Sign Up Today</h2>
+                	<form>
+                    	<input name="username" type="text" class="form-control" placeholder="Your Username">
+                    	<input name="password" type="password" class="form-control" placeholder="Your Password">
+                	</form> 
+                	<div>  
+                		<a href="#0.1_" class="btn">Sign Up</a>
+                	</div>
+            	</div>  
+           </div>   
+        </div>  
+    </div>
+</div>      	
 
-<p> Run Away With Me seeks to inspire you to lead a healthy lifestyle within a community. If you have ever found yourself wanting to go on a run but losing motivation, or wanting to exercise with someone else, Run Away With Me helps you make that idea concrete and connect with others. Whether you want to run right now, schedule a time to run later, run by the beach, etc,  Run Away With me will find someone within 5 miles that matches your mile time, and will notify you via text and on the web whenever you have a match. </p>
-<!-- 
-<div class="list-group">
-  <a href="#" class="list-group-item active">
-	 <h4 class="list-group-item-heading">All possible runs you can go on </h4>
-	 <p class="list-group-item-text">Current runs happening close by: </p>
-  </a>
-</div>
-
-<div class='media' id='result'> -->
-
-</div>
+</body>
 {% endblock %}

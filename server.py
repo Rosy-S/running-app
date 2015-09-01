@@ -180,22 +180,22 @@ def choose_run(run_id):
 	recipient = UserRun.query.get(run_id)
 	recipient_id = recipient.user1
 	recipient_number = User.query.get(recipient_id).phone
+	recipient_name = User.query.get(recipient_id).user_name
 	new_match = Match(asker_id=session['user_id'], recipient_id=recipient_id, run_id=run_id, asked_at=datetime.datetime.now())
 	db.session.add(new_match)
 	db.session.commit()
 	match_info = new_match.make_match_dictionary()
 	match_info['recipient_name'] = recipient.user.user_name
+	str_asker_id = str(asker_id)
 	# send a text to person who did the run app (test in this case) to check their email box.
 
 	client = TwilioRestClient(os.environ['TWILIO_ACCOUNT_SID'], os.environ['TWILIO_AUTH_TOKEN'])
 	message=client.messages.create(from_=os.environ['TWILLIO_NUMBER'], to=recipient_number, body=("Hey there! %s wants to go on the run you posted! Login and check your ibox to confirm!") % (asker_name))
-	print "Twilio confirmation message: ", message.sid 
 
-# @app.route("/choose-run/<int:run_id>")
-# def choose_run(self, run_id):            # get from url like /17
+	flash("You have just chosen to run with " + recipient_name)
 
-	return render_template("choose_run.html", match_info=match_info)
-	 
+
+	return redirect("/users/" + str_asker_id + "/" + asker_name)
 @app.route('/finding_match', methods=["POST"])
 def finding_match(): 
 	print "******************* making a user run *****************************"
@@ -234,7 +234,7 @@ def finding_match():
 		db.session.add(new_match)
 		db.session.commit()
 		
-	return "success"
+	return jsonify({'new_match_id': new_match.run_id})
 
 
 
@@ -260,12 +260,6 @@ def show_requests(user_id):
 			asker_info = User.query.get(match.asker_id)
 			# we are putting a list of tuples that are the match, and run corresponding to that match that the recipeint made.
 			jinja_content['matches'].append((match, run_info, asker_info))
-	print "our jinja matches: ", jinja_content['matches']
-	for match in jinja_content['matches']:
-		print "asker info: ", asker_info.user_name
-		print "Run info: ", run_info.time_start
-		print "run duration: ", run_info.duration
-
 	return render_template("inbox.html", jinja_content=jinja_content)
 
 
@@ -274,23 +268,31 @@ def run_confirmation(match_id):
 	# handling accpting on the match table
 	accepted_match = Match.query.get(match_id)
 	accepted_match.accepted = True
+	db.session.add(accepted_match)
+	db.session.commit()
 	asker_number = User.query.get(accepted_match.asker_id).phone
 	asker_name = accepted_match.user.user_name
 	recipeint_number = User.query.get(accepted_match.recipient_id).phone 
 	recipient_name = User.query.get(accepted_match.recipient_id).user_name
-	print "asker number and recipient number: ", asker_number, recipeint_number 
 	client = TwilioRestClient(os.environ['TWILIO_ACCOUNT_SID'], os.environ['TWILIO_AUTH_TOKEN'])
 	message=client.messages.create(from_=os.environ['TWILLIO_NUMBER'], to=asker_number, body=("Hello! %s got the message that you want to run with them! You are running with them at the time specified! Have fun!") % (recipient_name))
-	print message.sid 
-	return "success"
+	user_id = session.get('user_id')
+	return redirect('/inbox/requests/' + user_id)
+
 
 @app.route('/make_run/no-thanks/<int:match_id>')
 def run_rejection(match_id):
 	rejected_match = Match.query.get(match_id)
 	rejected_match.accepted = False
+	db.session.add(rejected_match)
+	db.session.commit()
+	user_id = str(session.get('user_id'))
+	print "THE USER ID: ", user_id
 
 	#handling rejection
-	return "you have rejected"
+	return redirect('/inbox/requests/' + user_id)
+
+
 
 @app.route('/test')
 def test(): 
@@ -302,7 +304,7 @@ def test():
 if __name__ == "__main__":
 	# We have to set debug=True here, since it has to be True at the point
 	# that we invoke the DebugToolbarExtension
-	app.debug = False
+	app.debug = True
 
 	connect_to_db(app)
 

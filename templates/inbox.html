@@ -28,7 +28,9 @@
             <td> {{ asker_info.user_name }} </td>
             <td class="timestart"> {{run_info.time_start }} </td>
             <td> {{run_info.duration }} </td>
-            <td> <a href="/make_run/confirmation/{{match.match_id }}" button type="button" class="btn btn-primary">Accept</a> <a href="/make_run/no-thanks/{{ match.match_id}}" button type="button" class="btn btn-danger"> Decline </a></td>
+            {% if match.accepted == None %}
+               <td> <a href="/make_run/confirmation/{{match.match_id }}" button type="button" class="btn btn-primary">Accept</a> <a href="/make_run/no-thanks/{{ match.match_id}}" button type="button" class="btn btn-danger"> Decline </a></td>
+            {% endif %}
          </tr>
    {% endfor %}
    </tbody>

@@ -30,6 +30,7 @@ $(document).on('ready', function(){
 
         marker = new google.maps.Marker({
           draggable: true,
+          // icon: '/static/img/runnersicon.png',
           position: {'lat':lat,
                       'lng': lon},
           map: map,
@@ -90,20 +91,26 @@ function findMatch (evt){
     // bases for required bootstrap media object functionality
     
 
-    for (var i = 0; i < data.match.length; i++) {
+    // for (var i = 0; i < data.match.length; i++) {
+    var message = "great! We got down your details. Expect a text soon!";
+    $('#runbutton').remove();
+    $('#results').html('<div class= "alert alert-success">' + message + '</div>');
 
-      user_profile_url = '"/matchdetails"';
-      user_img_src = "/static/img/placeholder.img";
-      user_name = data.match[i]['user_name'];
-      description = data.match[i]['duration'];
-      pace = data.match[i]['pace'];
-       // miles away now, duration, pace
 
-      to_insert = base1 + user_profile_url + base2 + user_img_src + base3 + String(user_name) + "</h4>" + description + pace + "</div>";  
-      console.log(to_insert);      
 
-      $("#result").append(to_insert);         
-    }
+
+    //   user_profile_url = '"/matchdetails"';
+    //   user_img_src = "/static/img/placeholder.img";
+    //   user_name = data.match[i]['user_name'];
+    //   description = data.match[i]['duration'];
+    //   pace = data.match[i]['pace'];
+    //    // miles away now, duration, pace
+
+    //   to_insert = base1 + user_profile_url + base2 + user_img_src + base3 + String(user_name) + "</h4>" + description + pace + "</div>";  
+    //   console.log(to_insert);      
+
+    //   $("#result").append(to_insert);         
+    // }
 
 
     //data.match is a list of objects. for each item in the list, make div id resulsts, and do the selecter that says
