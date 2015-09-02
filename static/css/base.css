@@ -1,3 +1,4 @@
+
 .navbar, .navbar-default .navbar-brand, .navbar-default .navbar-nav li a {
     background: rgba(0, 0, 0, 1);
     border: none;
@@ -5,4 +6,8 @@
     color: #e7d1bc;
     font-family: 'Pacifico';
     font-size: 18px;
+}
+
+.list-group-item {
+	margin: auto;
 }

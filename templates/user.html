@@ -15,7 +15,8 @@
         }
         #map {
           height: 500px;
-          width: 850px;
+          width: 1100px;
+          margin: auto;
         }
       </style>
       <title> Hello User! </title>
@@ -28,7 +29,7 @@
   <p> This is your profile. You can see people close-by that want to run and a list of past runs. If you see no one, you can always click "I want to run!" to make your own run!</p><br>
   <div class="container">
     <div class="row">
-      <div class="run-list col-md-6 col-lg-6 left">
+      <div class="run-list col-md-8 col-lg-8 left">
         {% if runs %}
           <div class="panel panel-default">
             <div class="panel-heading"> 
@@ -57,40 +58,13 @@
               {% endif %}
       </div>
 
-      <div class="run-list col-md-6 col-lg-6 right">
+      <div class="run-list col-md-4 col-lg-4 right">
         <p> Don't see a run that you like? Click these buttons to make your own run! </p>
 
         <button id='runbutton' type="button" data-toggle="modal" data-target="#runningform" class="btn btn-primary">run now!</button>
-        <button id='timedrunbutton' type="button" data-toggle="modal" data-target="#timedrun"class="btn btn-primary"> Schedule a time to run later!</button>
+        <button id='timedrunbutton' type="button" data-toggle="modal" data-target="#timedrun"class="btn btn-primary"> Schedule a run!</button>
 
-
-
-    <div style="visibility: hidden" id="timedrun">
-      So you want to gear up to run at a later time. No problem! Just fill in the details below and we'll message you when that time comes closer
-      <form action="/{{user_id}}/{{user_name}}/schedule_run" method="POST">
-        <input type="hidden" name="scheduled" value="True">
-        <label for="datepicker"> Pick the date you want to run from the caledar below </label>
-
-          <p>Date: <input type="text" id="datepicker" name="datepicker" size="30"></p>
-
-        <label> Choose a time to run on that day: </label>
-        <input type="text" placeholder="format is 5:45 PM" name="time"> <br>
-
-        <label> How long do you want to run for? </label>
-          <div class="slider">
-          </div>
-          <p>
-          <input type="text" class="amount" name="amount" readonly style="border:0; color:#f6931f; font-weight:bold;">
-          </p> 
-            <div>
-                <input type="submit" value="I'm ready to run!">
-            </div>     
-
-      </form>
-    </div>
-
-
-  <!--       Modal Windows  still inside a div container for full page   -->
+<!--       Modal Windows  still inside a div container for full page   -->
   <div class="modal fade" id="timedrun" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
@@ -99,26 +73,26 @@
         <!-- Modal Header -->
         <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title" id="myModalLabel"> Scheduling a Run Later </h4>
+          <h4 class="modal-title" id="myModalLabel"> Scheduling a Run </h4>
         </div> <!-- Closing Modal Header -->
 
         <!-- Modal Body -->
         <div class="modal-body">
           Great! let's get down your details:
-          <form action="/{{user_id}}/{{user_name}}/schedule_run" method="POST">
-            <input type="hidden" name="scheduled" value="False">
-            <label for="amount">How long do you want to run for? (5 min increments)</label>
-              <div class="slider">
-              </div>
-              <p>
-              <input type="text" class="amount" name="amount" readonly style="border:0; color:#f6931f; font-weight:bold;">
-              </p>
+          <input type="hidden" name="scheduled" value="True">
+          <label for="datepicker"> Pick the date you want to run from the caledar below </label>
 
-              <label for="time_amount"> We do our best to match you asap. If you have any time constraints on the amount of time it takes for a match, please specify and we will cancel your request after that time if there is no match. </label>
-                <div id="time_slider"> </div>
-                <p>
-                <input type="text" id="time_amount" name="time_amount" readonly style="border:0; color:#f6931f; font-weight:bold;">
-                </p>
+            <p>Date: <input type="text" id="datepicker" name="datepicker" size="30"></p>
+
+          <label> Choose a time to run on that day: </label>
+          <input type="text" placeholder="format is 5:45 PM" name="time"> <br>
+
+          <label> How long do you want to run for? </label>
+            <div class="slider">
+            </div>
+            <p>
+            <input type="text" class="amount" name="amount" readonly style="border:0; color:#f6931f; font-weight:bold;">
+            </p>
         </div> <!-- closing Modal Body -->
 
         <!-- Modal Footer -->
@@ -133,7 +107,8 @@
     </div> <!-- Closing Modal dialog -->
   </div> <!-- Closing Modal   -->
 
-<!--       Modal Windows  still inside a div container for full page   -->
+
+<!--       Modal Window for Run-Now  still inside a div container for full page   -->
   <div class="modal fade" id="runningform" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog" role="document">
       <div class="modal-content">

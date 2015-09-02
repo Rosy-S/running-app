@@ -251,9 +251,9 @@ def show_requests(user_id):
 			possible_matches.append(match)
 	jinja_content ={}
 	if not possible_matches: 
-		jinja_content['message'] = "no matches for now. Feel free to go to your profile and make as many matches as you would like!"
+		jinja_content['message'] = "No matches for now. Feel free to go to your profile and make as many matches as you would like!"
 	else: 
-		jinja_content['message'] = "you have %d requests to run!" % (len(possible_matches))
+		jinja_content['message'] = "You have %d requests to run!" % (len(possible_matches))
 		jinja_content['matches'] = []
 		for match in possible_matches:
 			run_info = match.run 
@@ -304,7 +304,7 @@ def test():
 if __name__ == "__main__":
 	# We have to set debug=True here, since it has to be True at the point
 	# that we invoke the DebugToolbarExtension
-	app.debug = True
+	app.debug = False
 
 	connect_to_db(app)
 

@@ -1,6 +1,0 @@
-$(document).on('ready', function(){
-	
-
-
-
-});
