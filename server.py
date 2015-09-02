@@ -276,7 +276,7 @@ def run_confirmation(match_id):
 	recipient_name = User.query.get(accepted_match.recipient_id).user_name
 	client = TwilioRestClient(os.environ['TWILIO_ACCOUNT_SID'], os.environ['TWILIO_AUTH_TOKEN'])
 	message=client.messages.create(from_=os.environ['TWILLIO_NUMBER'], to=asker_number, body=("Hello! %s got the message that you want to run with them! You are running with them at the time specified! Have fun!") % (recipient_name))
-	user_id = session.get('user_id')
+	user_id = str(session.get('user_id'))
 	return redirect('/inbox/requests/' + user_id)
 
 

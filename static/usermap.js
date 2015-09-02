@@ -24,6 +24,8 @@ function formatAMPM(date) {
   return strTime;
 }
 
+
+
 // $(document).on('ready', function(){
 function initMap() {
 
@@ -87,8 +89,7 @@ function initMap() {
       	position: {lat: markerData['lat'], lng: markerData['lon']},
       	map: map,
       	animation: google.maps.Animation.DROP,
-      	// icon: image,
-      	// shape: shape,
+      	icon: '/static/img/runnersicon.png',
       	title: "map of possible runs",
       	// zIndex: beach[3]
     	});

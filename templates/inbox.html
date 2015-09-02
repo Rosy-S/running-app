@@ -8,11 +8,11 @@
 {% endblock %}
 
 {% block content %}
+<div class="container">
 <h1> Your Messages </h1>
 
 {% if 'matches' in jinja_content %}
    <p> {{ jinja_content['message'] }} </p>
-   <p> beginning table below </p>
    <table class="table table-hover">
       <thead>
          <tr>
@@ -26,10 +26,18 @@
    {% for match, run_info, asker_info in jinja_content['matches'] %}
          <tr>
             <td> {{ asker_info.user_name }} </td>
-            <td class="timestart"> {{run_info.time_start }} </td>
+            <td class="timestart"> {{run_info.time_start.strftime("%B %d, %Y at %I:%M %p") }} </td>
             <td> {{run_info.duration }} </td>
             {% if match.accepted == None %}
                <td> <a href="/make_run/confirmation/{{match.match_id }}" button type="button" class="btn btn-primary">Accept</a> <a href="/make_run/no-thanks/{{ match.match_id}}" button type="button" class="btn btn-danger"> Decline </a></td>
+            
+            {% else %}
+               {% if match.accepted == True %}
+
+                  <td>Accepted</td>
+               {% else %}
+                  <td> Declined </td>
+               {% endif %}
             {% endif %}
          </tr>
    {% endfor %}
@@ -42,5 +50,5 @@
 
 {% endif %}
 
-
+</div>
 {% endblock %}

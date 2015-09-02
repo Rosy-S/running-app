@@ -14,81 +14,78 @@
           padding: 0;
         }
         #map {
-          height: 50%;
-          width: 50%;
+          height: 500px;
+          width: 850px;
         }
       </style>
       <title> Hello User! </title>
 {% endblock %}
 
 {% block content %}
-
+<div class="container">
   	<h1>{{ user_name }} </h1>
 
-  	<p> This is your profile. You can see people close to you that want to run and a list of past runs. If you see no one, you can always click "I want to run!" to make your own run!</p>
+  	<p> This is your profile. You can see people close-by that want to run and a list of past runs. If you see no one, you can always click "I want to run!" to make your own run!</p><br>
+        <div class="container">
+          <div class="row">
+            <div class="run-list col-md-6 col-lg-6 left">
+              {% if runs %}
+                <div class="panel panel-default">
+                  <div class="panel-heading"> 
+                    Possible Runs: </div>
+                    
+                    <ul class="list-group">
+                      {% for run, distance in runs %}
+                        <li class="list-group-item"><span class="marker"
+                        	data-lat="{{run.lat_coordinates|string}}"
+                        	data-lon="{{run.lon_coordinates|string}}"
+                        	data-name="{{run.user.user_name}}"
+                        	data-duration="{{run.duration|string}}"
+                        	data-miletime="{{run.user.mile_time}}"
+                        	data-scheduled="{{run.scheduled}}"
+                        	data-startdate="{{run.time_start}}"
+                        	data-endtime="{{run.time_end}}">
+                        </span>{{ run.user.user_name}} wants to run {{ distance|round(2, 'floor')}} miles away from your location. 
+                        <a href="/choose-run/{{ run.run_id }}" button type="button" class="btn btn-sm btn-primary">choose this run</a>
+                        </li>
+                      {% endfor %}        
+                  </ul>
+                </div>
+          
+              {% else %}
+                  Looks like there are no runs close to you that match your pace! You can always make your own run to get started!
+              {% endif %}
+            </div>
 
-
-      <div id='run-list'>
-      {% if runs %}
-          <h2> possible runs:</h2>
-      </div>
-
-          <ul>
-              {% for run, distance in runs %}
-
-              <li><span class="marker"
-              	data-lat="{{run.lat_coordinates|string}}"
-              	data-lon="{{run.lon_coordinates|string}}"
-              	data-name="{{run.user.user_name}}"
-              	data-duration="{{run.duration|string}}"
-              	data-miletime="{{run.user.mile_time}}"
-              	data-scheduled="{{run.scheduled}}"
-              	data-startdate="{{run.time_start}}"
-              	data-endtime="{{run.time_end}}">
-              </span>{{ run.user.user_name}} wants to run! their run is {{ distance|round(2, 'floor')}} miles away from your location. 
-              <a href="/choose-run/{{ run.run_id }}">choose this run</a>
-              </li>
-             
-
-              {% endfor %}        
-          </ul>
-        	<div id="map"></div>
-      {% else %}
-          Looks like there are no runs close to you that match your pace! You can always make your own run to get started!
-      {% endif %}
-
-
-  	<input id='runbutton' type="button" value="run now!"/> <input id='timedrunbutton' type="button" value="Schedule a time to run later!"/>
-
-
-  	<div style='visibility: hidden; height: 4px;' id="runningform">
-  		Great! let's get down your details:
-  		<form action="/{{user_id}}/{{user_name}}/schedule_run" method="POST">
-  			<input type="hidden" name="scheduled" value="False">
-    		<label for="amount">How long do you want to run for? (5 min increments)</label>
-  		    <div class="slider">
+    <div class="run-list col-md-6 col-lg-6 right">
+      <p> Don't see a run that you like? Click these buttons to make your own run! </p>
+      <input id='runbutton' type="button" class="btn btn-primary" value="run now!"/> <input id='timedrunbutton' type="button" class="btn btn-primary" value="Schedule a time to run later!"/>
+      <div style='visibility: hidden; height: 4px;' id="runningform">
+      Great! let's get down your details:
+      <form action="/{{user_id}}/{{user_name}}/schedule_run" method="POST">
+        <input type="hidden" name="scheduled" value="False">
+        <label for="amount">How long do you want to run for? (5 min increments)</label>
+          <div class="slider">
           </div>
           <p>
-    			<input type="text" class="amount" name="amount" readonly style="border:0; color:#f6931f; font-weight:bold;">
-  				</p>
+          <input type="text" class="amount" name="amount" readonly style="border:0; color:#f6931f; font-weight:bold;">
+          </p>
 
           <label for="time_amount"> We do our best to match you asap. If you have any time constraints on the amount of time it takes for a match, please specify and we will cancel your request after that time if there is no match. </label>
-          	<div id="time_slider"> </div>
-          	<p>
+            <div id="time_slider"> </div>
+            <p>
             <input type="text" id="time_amount" name="time_amount" readonly style="border:0; color:#f6931f; font-weight:bold;">
-  			    </p>
-          	<div>
-              	<input type="submit" value="I'm ready to run!">
-          	</div>
-  		</form>	
-  	</div>
+            </p>
+            <div>
+                <input type="submit" value="I'm ready to run!">
+            </div>
+      </form> 
+    </div>   
 
-  	
-
-  	<div style="visibility: hidden" id="timedrun">
-  		So you want to gear up to run at a later time. No problem! Just fill in the details below and we'll message you when that time comes closer
-  		<form action="/{{user_id}}/{{user_name}}/schedule_run" method="POST">
-  			<input type="hidden" name="scheduled" value="True">
+    <div style="visibility: hidden" id="timedrun">
+      So you want to gear up to run at a later time. No problem! Just fill in the details below and we'll message you when that time comes closer
+      <form action="/{{user_id}}/{{user_name}}/schedule_run" method="POST">
+        <input type="hidden" name="scheduled" value="True">
         <label for="datepicker"> Pick the date you want to run from the caledar below </label>
 
           <p>Date: <input type="text" id="datepicker" name="datepicker" size="30"></p>
@@ -97,19 +94,30 @@
         <input type="text" placeholder="format is 5:45 PM" name="time"> <br>
 
         <label> How long do you want to run for? </label>
-  		    <div class="slider">
+          <div class="slider">
           </div>
           <p>
-    			<input type="text" class="amount" name="amount" readonly style="border:0; color:#f6931f; font-weight:bold;">
-  				</p> 
-          	<div>
-              	<input type="submit" value="I'm ready to run!">
-          	</div>     
+          <input type="text" class="amount" name="amount" readonly style="border:0; color:#f6931f; font-weight:bold;">
+          </p> 
+            <div>
+                <input type="submit" value="I'm ready to run!">
+            </div>     
 
       </form>
     </div>
+  </div>
+</div>
+</div>
+{% if runs%}
+
+  <div id="map"></div>
+
+{% endif %}
+
+  <script>
 
 
+  </script>
   <script>
     $(function() {
       $( "#datepicker" ).datepicker();
@@ -120,11 +128,7 @@
         
       });
     });
-  </script>
 
-
-
-  <script>
   	
   	$("#runbutton").click(function(){
   	$('#runningform').css('visibility', "visible");
@@ -161,8 +165,6 @@
       });
       $( "#time_amount" ).val($( "#time_slider" ).slider( "value" ) +" min" );
     });
-
-
 
   </script>
 {% endblock %}

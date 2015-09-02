@@ -30,7 +30,7 @@ $(document).on('ready', function(){
 
         marker = new google.maps.Marker({
           draggable: true,
-          // icon: '/static/img/runnersicon.png',
+          icon: '/static/img/runnersicon.png',
           position: {'lat':lat,
                       'lng': lon},
           map: map,
