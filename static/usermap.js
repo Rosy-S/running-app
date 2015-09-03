@@ -1,4 +1,3 @@
-
 var map;
 var markers;
 var markerObjects;
@@ -9,11 +8,8 @@ var monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep',
 
 function formatAMPM(date) {
   var month = monthNames[date.getMonth()];
-  console.log("MONTH: ", month);
   var day = date.getDate();
-  console.log("DAY: ", day);
   var year = date.getFullYear();
-  console.log("YEAR: ", year);
   var hours = date.getHours();
   var minutes = date.getMinutes();
   var ampm = hours >= 12 ? 'pm' : 'am';
@@ -23,7 +19,6 @@ function formatAMPM(date) {
   var strTime = month + "/" + day + "/" + year + " at " + hours + ':' + minutes + ' ' + ampm;
   return strTime;
 }
-
 
 
 // $(document).on('ready', function(){
@@ -48,7 +43,7 @@ function initMap() {
     var current = new Date();
 
     if (current > timeDate){
-      timeDate = "<span style='color: red'><strong>now!</strong></span>";
+      timeDate = "<span style='color: red'><strong>Now!</strong></span>";
     } else {
       timeDate = formatAMPM(timeDate);
   

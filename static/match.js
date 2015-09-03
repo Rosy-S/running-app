@@ -92,7 +92,7 @@ function findMatch (evt){
     
 
     // for (var i = 0; i < data.match.length; i++) {
-    var message = "great! We got down your details. Expect a text soon!";
+    var message = "Great! We got down your details and are texting your potential running buddy";
     $('#runbutton').remove();
     $('#results').html('<div class= "alert alert-success">' + message + '</div>');
 

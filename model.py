@@ -51,13 +51,9 @@ class UserRun(db.Model):
 	# Define relationship to user
 	user = db.relationship("User",
 						   backref=db.backref("user_runs", order_by=user1))
-
-	# preferences = db.relationship("Preferences", 
-	#                                 backref=db.backref("preferences", order_by=user1))
-
+	
 	def __repr__(self):
 		"""Provide helpful representation when printed."""
-
 		return "<User Run id for user1=%s is %s, time_start=%s>" % (self.user1, self.run_id, self.time_start)
 
 	def json(self):
@@ -70,7 +66,6 @@ class UserRun(db.Model):
 		my_json_representation['time_end'] = self.time_end
 		my_json_representation['duration'] = self.duration
 
-		# finish adding all the atributes to this json thingie
 		return my_json_representation
 
 class Match(db.Model): 
@@ -86,7 +81,7 @@ class Match(db.Model):
 	viewed = db.Column(db.DATETIME)
 	accepted = db.Column(db.Boolean)
 
-	# defining relationship to user tale
+	# defining relationship to user 
 	user = db.relationship("User",
 						   backref=db.backref("user_matches", order_by=asker_id)) 
 
@@ -109,14 +104,6 @@ class Match(db.Model):
 		"""Provide helpful representation when printed."""
 
 		return "<Match id%s asked by%s, run_id=%s>" % (self.match_id, self.asker_id, self.run_id)
-
-# class Run(db.Model): 
-#     __tablename__ = "runs"
-
-#     pass
-
-
-
 
 
 ##############################################################################

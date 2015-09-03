@@ -6,7 +6,6 @@ from twilio.rest import TwilioRestClient
 
 from model import connect_to_db, db, User, UserRun, Match
 
-
 import datetime
 import re, math
 import os
@@ -99,16 +98,13 @@ def login_process():
 	session["user_id"] = user.user_id
 	session["user_name"] = user.user_name
 
-
-
-
-	
-
 	flash("Logged in")
 	return redirect("/users/%s/%s" % (user.user_id, user.user_name))
 
 @app.route('/meta-login', methods=['POST'])
 def function(): 
+
+	# meta-login required to get user's latitude and longitude coordinates upon signing in.
 	lat = request.form.get('lat')
 	lon = request.form.get('lon')
 	session['lat']  = lat
@@ -129,38 +125,41 @@ def logout():
 
 @app.route("/users/<int:user_id>/<user_name>")
 def user_detail(user_id, user_name):
-	"""Show info about user."""
+	"""Show potential runs given a user."""
 
 	current_user = User.query.get(session['user_id'])
 	current_user_id = current_user.user_id 
 	current_user_pace = (current_user.mile_time)
 	user_lat = session['lat']
 	user_lon = session['lon']
-	# check for expired runs: 
+	# check for expired runs and change active status to False: 
 	expired_runs = UserRun.query.filter(UserRun.time_end < datetime.datetime.now()).all()
 	if expired_runs: 
 		for expired_run in expired_runs: 
 			expired_run.active_status = False
 		db.session.commit()
-		# check for active runs that are not the user's run
+
+	# check for active runs that are not the user's run and store them in potetial_runs variable
 	potential_runs = UserRun.query.filter(UserRun.active_status == True, UserRun.user1 != current_user_id).all()
 	final_runs = []
 	for run in potential_runs: 
-		#if the pace of the user is within 1.5 min of each other: 
-		if abs(current_user_pace - run.user.mile_time)  < 2.5: 
+		# if the pace of the user is within 2 min of each other: 
+		if abs(current_user_pace - run.user.mile_time)  < 2: 
 			# if the duration is within 10 min of each other: 
 			run_lon = float(run.lon_coordinates)
 			run_lat = float(run.lat_coordinates)
 			degree_distance = math.sqrt(((float(user_lat) - run_lat)**2) + ((float(user_lon) - run_lon)**2))
 			miles_distance = degree_distance * CONSTANT_MI_DEGREE
+			# using distance equation, if distance is within 5 miles from the other run, store run in final_runs variable
 			if miles_distance < 5: 
 				final_runs.append((run, miles_distance))
 
 
-	return render_template("user.html", user_id=user_id, runs=final_runs, user_name=user_name) # , javascript_object=javascript_object)
+	return render_template("user.html", user_id=user_id, runs=final_runs, user_name=user_name) 
 
 @app.route('/<int:user_id>/<string:user_name>/schedule_run', methods=['POST'])
 def scheduling_run(user_id, user_name): 
+	""" Step 1 out of 2 for making a run for a user """
 	duration = request.form.get("amount")
 	wait_time = request.form.get("time_amount")
 	scheduled = request.form.get('scheduled')
@@ -174,7 +173,8 @@ def scheduling_run(user_id, user_name):
 
 @app.route("/choose-run/<int:run_id>")
 def choose_run(run_id):
-	print "^^^^^^^^^^^^^^^^^^^^^^^^ making a match ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
+	""" Making a match when a user chooses a run and sending a text notifying the maker of the run"""
+	
 	asker_id = session['user_id']
 	asker_name = User.query.get(asker_id).user_name
 	recipient = UserRun.query.get(run_id)
@@ -198,11 +198,13 @@ def choose_run(run_id):
 	return redirect("/users/" + str_asker_id + "/" + asker_name)
 @app.route('/finding_match', methods=["POST"])
 def finding_match(): 
-	print "******************* making a user run *****************************"
+	""" Route to handle ajax request to get user's prefered run location as lat and lng coordinates"""
+
 	# Adding/updating a match column for the user currently in the session.
 	lat = float(request.form.get('lat'))
 	lon = float(request.form.get('lon'))
 	duration = request.form.get("duration")
+	# RegEx needed to parse user's input
 	duration = int(re.sub("[^0-9]", "", duration))
 	wait_time = request.form.get("wait_time")  
 	wait_time = int(re.sub("[^0-9]", "", wait_time))
@@ -210,6 +212,7 @@ def finding_match():
 	date = request.form.get('date')
 	time = request.form.get('time')
 
+	# if the user wants to "run now", time start is current time. Otherwise parse form datetime information to store it in time_start
 	if scheduled == "False": 
 		time_start = datetime.datetime.now()
 	else: 
@@ -217,15 +220,15 @@ def finding_match():
 		time_start = datetime.datetime.strptime(full_time, "%m/%d/%Y/%I/%M%p")
 	
 	time_end = time_start + datetime.timedelta(minutes=wait_time)
-	existing_match = UserRun.query.filter_by(user1=session['user_id']).first()
+	existing_run = UserRun.query.filter_by(user1=session['user_id']).first()
 
-	if not existing_match:
+	if not existing_run:
 		new_match = UserRun(user1=session['user_id'], lat_coordinates=lat, lon_coordinates=lon, time_start=time_start, time_end=time_end, duration=duration)
 		db.session.add(new_match)
 		db.session.commit()
 	else: 
 		lst_of_runs = UserRun.query.filter_by(user1=session['user_id']).all()
-		# updating all of the user's UserRun requests to False if they are not the most current subimtted one.
+		# deactivating user runs that have expired at this point in time.
 		for run in lst_of_runs:
 			if run.time_end  < datetime.datetime.now(): 
 				run.active_status = False
@@ -236,46 +239,52 @@ def finding_match():
 		
 	return jsonify({'new_match_id': new_match.run_id})
 
-
-
-
-
 @app.route('/inbox/requests/<int:user_id>')
 def show_requests(user_id): 
-	# the user in the session here is the person that is the recipient.
-	#FIX ME: query for datetimes after the datetime.datetime.now()
+	""" Showing current user potential matches. Users can decline (deactivating the match) or accept (completing the match) """
+
+	# query Match database for matches pertaining to the user currently logged in
 	preliminary_matches = Match.query.filter(Match.recipient_id == session['user_id']).all()
-	possible_matches = []
+	final_matches = []
+
+	# filtetering preliminary_matches if they are not already deactivated or expired
 	for match in preliminary_matches: 
 		if (match.run.time_end > datetime.datetime.now()) and (match.accepted != False): 
-			possible_matches.append(match)
-	jinja_content ={}
-	if not possible_matches: 
-		jinja_content['message'] = "No matches for now. Feel free to go to your profile and make as many matches as you would like!"
+			final_matches.append(match)
+	jinja_js_content ={} # preparing to pass information to jinja and javascript so it can be displayed
+	
+	#If no matches exist for a user, display such message. Otherwise, append alternate message and objects storing data we need to display to user
+	if not final_matches: 
+		jinja_js_content['message'] = "No matches for now. Feel free to go to your profile and make as many matches as you would like!"
 	else: 
-		jinja_content['message'] = "You have %d requests to run!" % (len(possible_matches))
-		jinja_content['matches'] = []
-		for match in possible_matches:
+		jinja_js_content['message'] = "You have %d requests to run!" % (len(final_matches))
+		jinja_js_content['matches'] = []
+		for match in final_matches:
 			run_info = match.run 
 			asker_info = User.query.get(match.asker_id)
-			# we are putting a list of tuples that are the match, and run corresponding to that match that the recipeint made.
-			jinja_content['matches'].append((match, run_info, asker_info))
-	return render_template("inbox.html", jinja_content=jinja_content)
+			# Making a list of tuples match, run and usser objects corresponding to that match that the recipeint made.
+			jinja_js_content['matches'].append((match, run_info, asker_info))
+	return render_template("inbox.html", jinja_content=jinja_js_content)
 
 
 @app.route('/make_run/confirmation/<int:match_id>')
 def run_confirmation(match_id): 
-	# handling accpting on the match table
+	""" Handling an accepted match on the Match table"""
+
+	# changing status of accepted match to True
 	accepted_match = Match.query.get(match_id)
 	accepted_match.accepted = True
 	db.session.add(accepted_match)
 	db.session.commit()
+
+	time_start = accepted_match.run.time_start.strftime("%B %d, %Y at %I:%M %p")
+	# getting phone numbers for respective asker and recipient
 	asker_number = User.query.get(accepted_match.asker_id).phone
 	asker_name = accepted_match.user.user_name
 	recipeint_number = User.query.get(accepted_match.recipient_id).phone 
 	recipient_name = User.query.get(accepted_match.recipient_id).user_name
 	client = TwilioRestClient(os.environ['TWILIO_ACCOUNT_SID'], os.environ['TWILIO_AUTH_TOKEN'])
-	message=client.messages.create(from_=os.environ['TWILLIO_NUMBER'], to=asker_number, body=("Hello! %s got the message that you want to run with them! You are running with them at the time specified! Have fun!") % (recipient_name))
+	message=client.messages.create(from_=os.environ['TWILLIO_NUMBER'], to=asker_number, body=("Hello! %s got the message that you want to run with them! You are running with them on %s!") % (recipient_name, time_start))
 	user_id = str(session.get('user_id'))
 	return redirect('/inbox/requests/' + user_id)
 
@@ -287,7 +296,6 @@ def run_rejection(match_id):
 	db.session.add(rejected_match)
 	db.session.commit()
 	user_id = str(session.get('user_id'))
-	print "THE USER ID: ", user_id
 
 	#handling rejection
 	return redirect('/inbox/requests/' + user_id)
@@ -304,11 +312,11 @@ def test():
 if __name__ == "__main__":
 	# We have to set debug=True here, since it has to be True at the point
 	# that we invoke the DebugToolbarExtension
-	app.debug = False
+	app.debug = True
 
 	connect_to_db(app)
 
-	# Use the DebugToolbar
-	DebugToolbarExtension(app)
+	# # Use the DebugToolbar
+	# DebugToolbarExtension(app)
 
 	app.run()
