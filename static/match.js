@@ -1,6 +1,4 @@
-// Note: This example requires that you consent to location sharing when
-// prompted by your browser. If you see a blank space instead of the map, this
-// is probably because you have denied permission for location sharing.
+
 var marker;
 $(document).on('ready', function(){
   console.log('beginning test');
@@ -8,7 +6,7 @@ $(document).on('ready', function(){
   var lat;
   var lon;
 
-
+//initializing Google Map with draggable marker
   function initialize() {
     var mapOptions = {
       zoom: 15
@@ -26,8 +24,6 @@ $(document).on('ready', function(){
         console.log(lat);
         console.log(lon);
         
-
-
         marker = new google.maps.Marker({
           draggable: true,
           icon: '/static/img/runnersicon.png',
@@ -36,9 +32,6 @@ $(document).on('ready', function(){
           map: map,
           title: 'Drag to move your run location'
         });
-
-
-
 
         map.setCenter(pos);
       }, function() {
@@ -75,7 +68,6 @@ function handleNoGeolocation(errorFlag) {
 }
 
 
-
 //evt = metatdata on the event, event.current target for example. 
 function findMatch (evt){
   var draggedLat = marker.position.G;
@@ -87,38 +79,12 @@ function findMatch (evt){
   var matchTime = $('#match_data').data('time');
   var inputs = {"lat": draggedLat, "lon": draggedLon, "duration": matchDuration, "wait_time": matchWaitTime, "scheduled": matchScheduled, "date": matchDate, "time": matchTime};
 
+//returning latitude and longitude to server, and changing html to success message.
   $.post('/finding_match', inputs , function(data){
-    // bases for required bootstrap media object functionality
     
-
-    // for (var i = 0; i < data.match.length; i++) {
     var message = "Great! We got down your details and are texting your potential running buddy";
     $('#runbutton').remove();
     $('#results').html('<div class= "alert alert-success">' + message + '</div>');
-
-
-
-
-    //   user_profile_url = '"/matchdetails"';
-    //   user_img_src = "/static/img/placeholder.img";
-    //   user_name = data.match[i]['user_name'];
-    //   description = data.match[i]['duration'];
-    //   pace = data.match[i]['pace'];
-    //    // miles away now, duration, pace
-
-    //   to_insert = base1 + user_profile_url + base2 + user_img_src + base3 + String(user_name) + "</h4>" + description + pace + "</div>";  
-    //   console.log(to_insert);      
-
-    //   $("#result").append(to_insert);         
-    // }
-
-
-    //data.match is a list of objects. for each item in the list, make div id resulsts, and do the selecter that says
-    //look for things taht are in the resulsts, and append onto it some code which is a paragraph
-
-
-    // not finished with this function. Need to plan for the duration of the run, getting the user id of person available, and time ending the run. 
-    
 
   });
 };
