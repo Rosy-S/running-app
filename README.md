@@ -40,8 +40,8 @@ Have you ever found yourself wanting to run, but losing motivation, wanting acco
 
 - The map will have details of the run that will disply if you click on the runner icon. There are two types of runs you can choose: The runs that state "run now" are runs where the creator of the run wants to run right now and are open for an invitation to run. Runs that are scheduled runs are by contrast have the date and time that the run is scheduled forOn the map, they will be displayed as such, respectively:
 
-![Image](/static/img/runningnow.png =250x "User wants to run now")
-![Image](/static/img/Scheduledrun.png =250x "User scheduled a run")
+![Image](/static/img/runningnow.png =250x)
+![Image](/static/img/Scheduledrun.png =250x)
 
 - Once a user clicks on "Choose this run" for any run, they will get a confirmation message, and it will send a text to the creator of the run that they have a match and to check their inbox.
 
