@@ -34,14 +34,14 @@ Have you ever found yourself wanting to run, but losing motivation, wanting acco
 
 - a user's profile shows the possible runs a user can choose and a map displying details about the run and where they are located. In order for a user to see a run, a run must be located within 5 miles of their current location (found initially at the user login), the runner has to be within a 2 min/mile difference than the user currently logged in, the run cannot be the user's own posted run, and the runs have to be active (not expired). 
 
-![Screenshot](/static/img/Userprofile.png px="User's profile")
+![Screenshot](/static/img/Userprofile.png "User's profile")
 
 #### Choosing a Run ####
 
 - The map will have details of the run that will disply if you click on the runner icon. There are two types of runs you can choose: The runs that state "run now" are runs where the creator of the run wants to run right now and are open for an invitation to run. Runs that are scheduled runs are by contrast have the date and time that the run is scheduled forOn the map, they will be displayed as such, respectively:
 
-![Image](/static/img/runningnow.png =250x)
-![Image](/static/img/Scheduledrun.png =250x)
+![Image](/static/img/runningnow.png =250px)
+![Image](/static/img/Scheduledrun.png =250=px)
 
 - Once a user clicks on "Choose this run" for any run, they will get a confirmation message, and it will send a text to the creator of the run that they have a match and to check their inbox.
 
