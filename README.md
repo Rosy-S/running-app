@@ -40,8 +40,8 @@ Have you ever found yourself wanting to run, but losing motivation, wanting acco
 
 - The map will have details of the run that will disply if you click on the runner icon. There are two types of runs you can choose: The runs that state "run now" are runs where the creator of the run wants to run right now and are open for an invitation to run. Runs that are scheduled runs are by contrast have the date and time that the run is scheduled forOn the map, they will be displayed as such, respectively:
 
-<img src=/static/img/runningnow.png height=170 />
-<img src=/static/img/Scheduledrun.png height=170 />
+<img src=/static/img/runningnow.png height=160 />
+<img src=/static/img/Scheduledrun.png height=160 />
 
 - Once a user clicks on "Choose this run" for any run, they will get a confirmation message, and it will send a text to the creator of the run that they have a match and to check their inbox.
 
@@ -49,8 +49,8 @@ Have you ever found yourself wanting to run, but losing motivation, wanting acco
 
 - If a user does not see a run that they like or no runs are displayed, they can always make their own run. They can either click on "run now" which has a duration and a waiting time that they are willing to wait, or "schedule a run" where a user can choose the date and the time that they want to run. They will be displayed as such, respectively:
 
-<img src=/static/img/MakingNowRun.png height=100 />
-<img src=/static/img/MakingScheduledRun.png height=100 />
+<img src=/static/img/MakingNowRun.png height=160 />
+<img src=/static/img/MakingScheduledRun.png height=160 />
 
 - After they enter their details for either "run now" or "schedule a run," they will be taken to the following window to choose their start location. The default start location is their location at the current time: 
 
