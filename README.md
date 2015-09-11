@@ -49,8 +49,8 @@ Have you ever found yourself wanting to run, but losing motivation, wanting acco
 
 - If a user does not see a run that they like or no runs are displayed, they can always make their own run. They can either click on "run now" which has a duration and a waiting time that they are willing to wait, or "schedule a run" where a user can choose the date and the time that they want to run. They will be displayed as such, respectively:
 
-<img src=/static/img/MakingNowRun.png height=230 />
-<img src=/static/img/MakingScheduledRun.png height=230 />
+<img src=/static/img/MakingNowRun.png height=220 />
+<img src=/static/img/MakingScheduledRun.png height=220 />
 
 - After they enter their details for either "run now" or "schedule a run," they will be taken to the following window to choose their start location. The default start location is their location at the current time: 
 
