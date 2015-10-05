@@ -1,63 +1,75 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<h1>Register</h1>
 
-<form action="/register" method="POST">
+<div class='container-fluid'>
+<form class="form-horizontal" action="/register" method="POST">
+    <div class="row loginform">
+        <h2 style='text-align: center;'> Sign Up </h2><br>
+    	<div class="form-group">
+    		<label for="inputuser" class='col-sm-3 control-label'>
+    		Prefered user name </label>
+            <div class="col-sm-9"> 
+        	   <input type="text" class="form-control" id="inputuser" name="user_name" placeholder="User name" required>
+            </div>
+    	</div>
 
-	<div>
-		<label>
-			Prefered user name 
-			<input type="text" name="user_name">
-		</label>
-	</div>
+        <div class="form-group">
+            <label for="useremail" class='col-sm-3 control-label'>
+                Email </label>
+            <div class="col-sm-9">
+                <input type="email" class="form-control" id="useremail" name="email" placeholder="Email" required>
+            </div>
+        </div>
 
-    <div>
-        <label>
-            Email
-            <input type="email" name="email">
-        </label>
+        <div class="form-group">
+            <label for="userpassword" class='col-sm-3 control-label'>
+                Password </label>
+            <div class="col-sm-9">
+                <input type="password" name="password" class="form-control" id="userpassword" placeholder="Password" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="usermiletime" class='col-sm-3 control-label'>
+                Enter your mile time in min/mile: 
+            </label> 
+            <div class="col-sm-9">
+                <input type="text" name="mile_time" class="form-control" id="usermiletime" placeholder="Your mile-time">
+            </div>
+        </div>
+                
+        <div class= "form-group">
+            <label for="userphone" class='col-sm-3 control-label'>
+            Enter your phone number to recieve text reminders: 
+            </label>
+            <div class="col-sm-9">
+                <input type="text" name="phone" class="form-control" id="userphone" placeholder="10 digit phone number">
+            </div>
+        </div>
+
+        <div style='text-align:center; margin: auto;'>
+            <input class='btn btn-default' type="submit" value="Register">
+        </div>
     </div>
-
-    <div>
-        <label>
-            Password
-            <input type="password" name="password">
-        </label>
-    </div>
-
-    <input id='details_button' type="button" value="fill in my running preferences"/>
-
-    <div style='visibility: hidden' id="profile_details">
-
-        <p> Great! Let's get the last details in: </p>
-
-        <label>
-            Do you know your mile time?  <br>
-            I tend to run at a <input type="text" name="mile_time"> minutes per mile pace. <br>
-        </label>
-
-        <p> We can send you a text as soon as there is a match. Do you want to provide your phone number for this functionality? (if not, just leave it blank to use just your email.) </p>
-
-        <label>
-        Yes, my phone number is <input type="text" name="phone"><br>
-        </label>
-
-
-    <div>
-        <input type="submit" value="Register">
-    </div>
-
-    </div>
-
-    <script>
-
-    $("#details_button").click(function(){
-    $('#profile_details').css('visibility', "visible")
-    });
-
-    </script>
-
 </form>
+</div>
+
+    // <script>
+
+    // $("#details_button").click(function(){
+    //     $('#profile_details').css('visibility', "visible")
+    // });
+
+    // $(document).ready(function(){
+    //     $(window).keydown(function(event){
+    //         if(event.keyCode == 13) {
+    //             event.preventDefault();
+    //             $('#profile_details').css('visibility', 'visible')
+    //         }
+    //     });
+    // });   
+
+    // </script>
 
 {% endblock %}

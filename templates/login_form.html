@@ -6,26 +6,28 @@
 
 {% block content %}
 
-    <h1>Login</h1>
-    <form action="/login" method="POST">
-
-        <div>
-            <label>Email:
-                <input type="email" name="email" required>
-            </label>
+<div class="container-fluid">
+<form class="form-horizontal" action="/login" method="POST">
+    <div class="row loginform">
+        <h2 style='text-align: center;'>Login</h2><br>
+        <div class="form-group">
+            <label for="loginemail"class='col-sm-3 control-label'>Email: </label>
+            <div class="col-sm-9"> 
+                <input type="email" name="email" id='loginemail' placeholder='Your Email' required>
+            </div>
         </div>
 
-        <div>
-            <label>Password:
-                <input type="password" name="password" required>
-            </label>
+        <div class="form-group">
+            <label for="loginpassword" class='col-sm-3 control-label'>Password: </label>
+            <div class="col-sm-9"> 
+                <input type="password" name="password" id='loginpassword' placeholder='Your Password'required>
+            </div>
         </div>
-
-                <p id="location-error"></p>
-
-        <div>
-            <input type="submit" value="Log In">
+        <div style='text-align:center; margin: auto;'>
+            <input class='btn btn-default' type="submit" value="Log In">
         </div>
-
-    </form>
+    </div>
+    <p id="location-error"></p>
+</form>
+</div>
 {% endblock %}

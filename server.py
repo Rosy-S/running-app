@@ -199,7 +199,7 @@ def choose_run(run_id):
 @app.route('/finding_match', methods=["POST"])
 def finding_match(): 
 	""" Route to handle ajax request to get user's prefered run location as lat and lng coordinates"""
-
+	print "the values", request.form.values
 	# Adding/updating a match column for the user currently in the session.
 	lat = float(request.form.get('lat'))
 	lon = float(request.form.get('lon'))

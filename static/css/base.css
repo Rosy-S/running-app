@@ -11,3 +11,11 @@
 .list-group-item {
 	margin: auto;
 }
+
+.loginform {
+	margin-left: auto;
+	margin-right: auto; 
+	width: 60%;
+	border:  1px solid #FAEBD7;
+	padding: 3px;
+}
