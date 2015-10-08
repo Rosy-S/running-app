@@ -5,6 +5,7 @@
 <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.js"></script>
 <link href="/static/css/base.css" rel="stylesheet">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -19,8 +20,9 @@
             <div id="navbar" class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
                     <li ><a href="/">Home</a></li>
-                    <li><a href="/users/{{session['user_id']}}/{{session['user_name']}}">Profile</a></li>
+                    <li><a href="/users/{{session['user_id']}}/{{session['user_name']}}">Run</a></li>
                     <li><a href="/inbox/requests/{{ session['user_id'] }}">Inbox</a></li>
+                    <li><a href="/users/profile/{{session['user_id']}}/{{session['user_name']}}">Profile</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     <li><a href="/logout"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>

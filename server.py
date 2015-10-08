@@ -5,10 +5,12 @@ from flask_debugtoolbar import DebugToolbarExtension
 from twilio.rest import TwilioRestClient
 
 from model import connect_to_db, db, User, UserRun, Match
+from messaging import *
 
 import datetime
 import re, math
 import os
+
 
 
 CONSTANT_MI_DEGREE = 69
@@ -26,12 +28,7 @@ app.jinja_env.undefined = StrictUndefined
 @app.route('/')
 def index():
 
-
-
 	return render_template("homepage.html")
-
-
-
 
 ########REGISTRATION #####################################
 
@@ -186,16 +183,14 @@ def choose_run(run_id):
 	db.session.commit()
 	match_info = new_match.make_match_dictionary()
 	match_info['recipient_name'] = recipient.user.user_name
+	match_id = int(match_info['match_id'])
 	str_asker_id = str(asker_id)
-	# send a text to person who did the run app (test in this case) to check their email box.
-
-	client = TwilioRestClient(os.environ['TWILIO_ACCOUNT_SID'], os.environ['TWILIO_AUTH_TOKEN'])
-	message=client.messages.create(from_=os.environ['TWILLIO_NUMBER'], to=recipient_number, body=("Hey there! %s wants to go on the run you posted! Login and check your ibox to confirm!") % (asker_name))
+	# send a text to person who did the run app to check their email box or respond 'YES' with the match_id.
+	choosing_run(recipient_number, asker_name, match_id)
 
 	flash("You have just chosen to run with " + recipient_name)
-
-
 	return redirect("/users/" + str_asker_id + "/" + asker_name)
+
 @app.route('/finding_match', methods=["POST"])
 def finding_match(): 
 	""" Route to handle ajax request to get user's prefered run location as lat and lng coordinates"""
@@ -249,15 +244,15 @@ def show_requests(user_id):
 
 	# filtetering preliminary_matches if they are not already deactivated or expired
 	for match in preliminary_matches: 
-		if (match.run.time_end > datetime.datetime.now()) and (match.accepted != False): 
+		if (match.run.time_end > datetime.datetime.now()) and (match.accepted == None): 
 			final_matches.append(match)
 	jinja_js_content ={} # preparing to pass information to jinja and javascript so it can be displayed
 	
 	#If no matches exist for a user, display such message. Otherwise, append alternate message and objects storing data we need to display to user
 	if not final_matches: 
-		jinja_js_content['message'] = "No matches for now. Feel free to go to your profile and make as many matches as you would like!"
+		jinja_js_content['message'] = "You have no pending matches for now. Feel free to go to your profile and make as many matches as you would like!"
 	else: 
-		jinja_js_content['message'] = "You have %d requests to run!" % (len(final_matches))
+		jinja_js_content['message'] = "You have %d new requests to run!" % (len(final_matches))
 		jinja_js_content['matches'] = []
 		for match in final_matches:
 			run_info = match.run 
@@ -267,13 +262,13 @@ def show_requests(user_id):
 	return render_template("inbox.html", jinja_content=jinja_js_content)
 
 
-@app.route('/make_run/confirmation/<int:match_id>')
+@app.route('/make_run/confirmation/<int:match_id>', methods=["GET"])
 def run_confirmation(match_id): 
 	""" Handling an accepted match on the Match table"""
-
 	# changing status of accepted match to True
 	accepted_match = Match.query.get(match_id)
 	accepted_match.accepted = True
+	accepted_match.run.active_status = False
 	db.session.add(accepted_match)
 	db.session.commit()
 
@@ -283,8 +278,7 @@ def run_confirmation(match_id):
 	asker_name = accepted_match.user.user_name
 	recipeint_number = User.query.get(accepted_match.recipient_id).phone 
 	recipient_name = User.query.get(accepted_match.recipient_id).user_name
-	client = TwilioRestClient(os.environ['TWILIO_ACCOUNT_SID'], os.environ['TWILIO_AUTH_TOKEN'])
-	message=client.messages.create(from_=os.environ['TWILLIO_NUMBER'], to=asker_number, body=("Hello! %s got the message that you want to run with them! You are running with them on %s!") % (recipient_name, time_start))
+	confirmation_text(asker_number, recipient_name, time_start)
 	user_id = str(session.get('user_id'))
 	return redirect('/inbox/requests/' + user_id)
 
@@ -293,6 +287,7 @@ def run_confirmation(match_id):
 def run_rejection(match_id):
 	rejected_match = Match.query.get(match_id)
 	rejected_match.accepted = False
+	rejected_match.run.active_status = False
 	db.session.add(rejected_match)
 	db.session.commit()
 	user_id = str(session.get('user_id'))
@@ -301,10 +296,67 @@ def run_rejection(match_id):
 	return redirect('/inbox/requests/' + user_id)
 
 
+###################### USER PROFILE ROUTES ############################################
 
-@app.route('/test')
+@app.route("/users/profile/<int:user_id>/<string:user_name>")
+def user_profile(user_id, user_name):
+	return render_template("profile.html")
+	
+
+@app.route('/chart_stuff'): 
+def chart_stuff(): 
+
+
+
+
+
+#################### RESPOND BY TEXTING FEATURES ##################################
+@app.route('/incoming_texts', methods=['POST'])
 def test(): 
-	return render_template('test.html')
+	raw_from_number=request.values.get('From')
+	from_number = int(raw_from_number[2:])
+	incoming_message=request.values.get('Body')
+	incoming_message = incoming_message.split(' ')
+	print "THE INCOMING MESSAGE: ", incoming_message 
+	if len(incoming_message) > 1: 
+		print "in the first if statement"
+		match_id = int(incoming_message[0])
+		match_object = Match.query.get(match_id)
+		recipient_number = int(User.query.get(match_object.recipient_id).phone)
+		print "the recipeint phone: ", recipient_number
+		print "the from phone: ", from_number
+		if str(incoming_message[1]) in ['Yes', 'YES', 'yes'] and from_number == recipient_number: 
+			print "in the second if statement"
+			if match_object.accepted == None: 
+				print "in the fourth if statement"
+				match_object.accepted = True
+				match_object.run.active_status = False
+				db.session.add(match_object)
+				db.session.commit()
+				time_start = str(match_object.run.time_start.strftime("%B %d, %Y at %I:%M %p"))
+				print "The time start: ", time_start, "type of it: ", type(time_start)
+				message = "Great! You and your running buddy are all set to run! You are running on %s." % (time_start)
+			elif match_object.accepted == True: 
+				print "in the 5 if statement"
+				message = "This match has already been made and your run buddy has been contacted"
+			elif match_object.accepted == False: 
+				print "in the 6 if statement"
+				message = "You have already rejected this match"
+		elif str(incoming_message[1]) in ['No', 'NO', 'no'] and from_number == recipient_number: 
+			print "in the 7 if statement"
+			match_object.accepted = False 
+			message = "Gotcha, we will keep this run open until the expiration time."
+		else: 
+			message = "Sorry, it seems you typed something I could not compute. Please try again with the number specified in the text, and then a 'yes' or 'no'"
+	else: 
+		print "in the 8 elsse statement"
+		message = "Sorry, it seems you typed something I could not compute. Please try again with the number specified in the text, and then a 'yes' or 'no'"
+	print "the outgoing message: ", message
+	resp = twiml.Response()
+	resp.message(message)
+	print"**************************************************"
+	print "the response: ", str(resp)
+	return str(resp)
 
 
 
