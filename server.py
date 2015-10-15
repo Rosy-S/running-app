@@ -7,6 +7,7 @@ from twilio.rest import TwilioRestClient
 from model import connect_to_db, db, User, UserRun, Match
 from messaging import *
 
+import json
 import datetime
 import re, math
 import os
@@ -303,9 +304,79 @@ def user_profile(user_id, user_name):
 	return render_template("profile.html")
 	
 
-@app.route('/chart_stuff'): 
+@app.route('/chart_stuff')
 def chart_stuff(): 
+	all_recipient_matches = Match.query.filter(Match.recipient_id == session['user_id'], Match.accepted == True).all()
+	all_asker_matches = Match.query.filter(Match.asker_id == session['user_id'], Match.accepted == True).all()
+	frequency_dict = {}
+	# Storing the matches that the user in session was asked on
+	for match in all_recipient_matches: 
+		name = match.asker_id
+		if name in frequency_dict: 
+			frequency_dict[name] += 1
+		else: 
+			frequency_dict[name] = 1
 
+	# Storing the mathes that the user in session asked others
+	for match in all_asker_matches: 
+		name = match.recipient_id
+		if name in frequency_dict: 
+			frequency_dict[name] += 1
+		else: 
+			frequency_dict[name] = 1
+
+	# data_list_of_dicts  []
+	# for key, value in in frequency_dict.iteritems(): 
+	# 	data_list_of_dicts.append(
+	data_list_of_dicts = [
+		{
+			"value": 3,
+			"color": "#F7464A",
+			"highlight": "#FF5A5E",
+			"label": "test"
+		},
+		{
+			"value": 5,
+			"color": "#46BFBD",
+			"label": "Crenshaw"
+		},
+		{
+			"value": 2,
+			"color": "#FDB45C",
+			
+			"label": "Yellow Watermelon"
+		}
+	]
+	return json.dumps(data_list_of_dicts)
+
+@app.route('/chart_stuff2')
+def melon_data1():
+	data_dict =  {
+		"labels": ["January", "February", "March", "April", "May", "June", "July"],
+		"datasets": [
+			{
+				"label": "Watermelon",
+				"fillColor": "rgba(220,220,220,0.2)",
+				"strokeColor": "rgba(220,220,220,1)",
+				"pointColor": "rgba(220,220,220,1)",
+				"pointStrokeColor": "#fff",
+				"pointHighlightFill": "#fff",
+				"pointHighlightStroke": "rgba(220,220,220,1)",
+				"data": [65, 59, 80, 81, 56, 55, 40]
+			},
+			{
+				"label": "Cantaloupe",
+				"fillColor": "rgba(151,187,205,0.2)",
+				"strokeColor": "rgba(151,187,205,1)",
+				"pointColor": "rgba(151,187,205,1)",
+				"pointStrokeColor": "#fff",
+				"pointHighlightFill": "#fff",
+				"pointHighlightStroke": "rgba(151,187,205,1)",
+				"data": [28, 48, 40, 19, 86, 27, 90]
+			}
+		]
+	}
+	return json.dumps(data_dict)
 
 
 

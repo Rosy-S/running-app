@@ -6,29 +6,30 @@
 {% endblock %}
 
 {% block content %}
-
+<div class="container">
    <center><h1> Hello {{session['user_name']}} </h1></center>
    <br>
       <center><h5> {{ jinja_content['message'] }} </h5><center>
    <br>
 
    {% if 'matches' in jinja_content %}
+   <div class="row">
 
       <table class="table table-hover table-striped">
          <thead>
-            <center><tr>
+            <tr>
                <th>User Name</th>
                <th>Time</th>
                <th>Duration</th>
                <th>Actions</th>
-            </tr> </center>
+            </tr> 
          </thead>
          <tbody>
       {% for match, run_info, asker_info in jinja_content['matches'] %}
             <tr>
                <td> {{ asker_info.user_name }} </td>
                <td class="timestart"> {{ run_info.time_start.strftime("%B %d at %I:%M %p") }} </td>
-               <td> {{run_info.duration }} minutes </td>
+               <td> {{run_info.duration }} minutes &nbsp&nbsp&nbsp</td>
                {% if match.accepted == None %}
                   <td style='margin-right: 10px'> <a href="/make_run/confirmation/{{match.match_id }}" button type="button" class="btn btn-primary">Accept & Confirm</a> &nbsp&nbsp&nbsp<a href="/make_run/no-thanks/{{ match.match_id}}" button type="button" class="btn btn-danger"> Decline & Delete </a></td>             
                {% else %}
@@ -44,10 +45,11 @@
       </tbody>
       </table>
 
+   </div>
    {% else %}
    <center> <a href='/users/{{session["user_id"]}}/{{session["user_name"]}}' button type='button' class='btn btn-primary'> My Profile </a></center>
 
    {% endif %}
-
+</div>
 
 {% endblock %}

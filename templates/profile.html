@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% block head %}
+	<script src='/static/js/profile.js'></script>
 
 	<title> Your Profile </title>
 
@@ -8,8 +9,26 @@
 
 {% block content %}
 
-<p> hi this is your profile... it's very blank right now.... yes. </p>
+<h2> Your Running Dashboard </h2>
+<br><br>
+<div class="container">
+<div class="row">
+<p> Who have you ran with recently? </p>
+	<div class="melon-class"> 
+		<canvas id="donutChart"></canvas>
+	</div>
 
+	<div id="donutLegend" class="chart-legend"></div>
+</div>
+
+<hr>
+
+
+	<div class="melon-class">
+		<canvas id="lineChart"></canvas>
+	</div>
+		<div id="lineLegend" class="chart-legend"></div>
+</div>
 
 
 {% endblock %}
