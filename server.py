@@ -318,6 +318,7 @@ def chart_stuff():
 			frequency_dict[name] = 1
 
 	# Storing the mathes that the user in session asked others
+	# Frequency dict now has other runner's id as a key and the amount of times the user in session ran with them.
 	for match in all_asker_matches: 
 		name = match.recipient_id
 		if name in frequency_dict: 
@@ -325,6 +326,7 @@ def chart_stuff():
 		else: 
 			frequency_dict[name] = 1
 
+	print "frequency_dict: ",  frequency_dict
 	# data_list_of_dicts  []
 	# for key, value in in frequency_dict.iteritems(): 
 	# 	data_list_of_dicts.append(
@@ -387,46 +389,35 @@ def test():
 	raw_from_number=request.values.get('From')
 	from_number = int(raw_from_number[2:])
 	incoming_message=request.values.get('Body')
-	incoming_message = incoming_message.split(' ')
-	print "THE INCOMING MESSAGE: ", incoming_message 
+	incoming_message = incoming_message.split(' ') 
 	if len(incoming_message) > 1: 
-		print "in the first if statement"
 		match_id = int(incoming_message[0])
 		match_object = Match.query.get(match_id)
 		recipient_number = int(User.query.get(match_object.recipient_id).phone)
-		print "the recipeint phone: ", recipient_number
-		print "the from phone: ", from_number
+		recipient_name = str(User.query.get(match_object.recipient_id).user_name)
 		if str(incoming_message[1]) in ['Yes', 'YES', 'yes'] and from_number == recipient_number: 
-			print "in the second if statement"
 			if match_object.accepted == None: 
-				print "in the fourth if statement"
 				match_object.accepted = True
 				match_object.run.active_status = False
 				db.session.add(match_object)
 				db.session.commit()
 				time_start = str(match_object.run.time_start.strftime("%B %d, %Y at %I:%M %p"))
-				print "The time start: ", time_start, "type of it: ", type(time_start)
 				message = "Great! You and your running buddy are all set to run! You are running on %s." % (time_start)
+				confirmation_text(recipient_number, recipient_name, time_start)
 			elif match_object.accepted == True: 
-				print "in the 5 if statement"
 				message = "This match has already been made and your run buddy has been contacted"
 			elif match_object.accepted == False: 
-				print "in the 6 if statement"
 				message = "You have already rejected this match"
 		elif str(incoming_message[1]) in ['No', 'NO', 'no'] and from_number == recipient_number: 
-			print "in the 7 if statement"
 			match_object.accepted = False 
 			message = "Gotcha, we will keep this run open until the expiration time."
 		else: 
-			message = "Sorry, it seems you typed something I could not compute. Please try again with the number specified in the text, and then a 'yes' or 'no'"
+			message = "Sorry, it seems you typed something I could not understand. Please try again with the number specified in the text, and then a 'yes' or 'no'"
 	else: 
-		print "in the 8 elsse statement"
 		message = "Sorry, it seems you typed something I could not compute. Please try again with the number specified in the text, and then a 'yes' or 'no'"
-	print "the outgoing message: ", message
 	resp = twiml.Response()
 	resp.message(message)
 	print"**************************************************"
-	print "the response: ", str(resp)
 	return str(resp)
 
 

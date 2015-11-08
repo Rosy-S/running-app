@@ -88,6 +88,7 @@ class Match(db.Model):
 	run = db.relationship("UserRun", 
 							backref=db.backref("run_matches", order_by=run_id))
 
+
 	def make_match_dictionary(self): 
 		match_dictionary = {}
 		match_dictionary['match_id'] = self.match_id

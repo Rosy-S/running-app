@@ -38,5 +38,5 @@ if __name__ == "__main__":
 	connect_to_db(app)
 
 	load_users()
-	load_userRuns
-	load_matches
+	load_userRuns()
+	load_matches()

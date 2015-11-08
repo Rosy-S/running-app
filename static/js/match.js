@@ -70,10 +70,10 @@ function handleNoGeolocation(errorFlag) {
 
 //evt = metatdata on the event, event.current target for example. 
 function findMatch (evt){
-  var draggedLat = marker.position.J;
+  var draggedLat = marker.position.lat();
   console.log(draggedLat);
   console.log('test')
-  var draggedLon = marker.position.M;
+  var draggedLon = marker.position.lng();
   var matchDuration = $('#match_data').data('duration');
   var matchWaitTime = $('#match_data').data('wait-time');
   var matchScheduled = $('#match_data').data('scheduled');
